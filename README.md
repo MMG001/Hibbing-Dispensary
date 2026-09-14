@@ -60,7 +60,7 @@ St. Louis County, Itasca County, and Minnesota — each with its verified Wikipe
   the Hibbing city node (their Wikipedia pages confirm annexation).
 - *Reviews/AggregateRating* — no first-party reviews are collected/displayed on-site yet. Google
   or Yelp reviews may be displayed later but must **not** be marked up.
-- *FAQPage* — no visible Q&A blocks exist on these pages.
+- *FAQPage* — marked up **only** on `/faq`, where the Q&A is visibly rendered; the schema answers are generated from the same `FAQS` data as the page, so they always mirror visible text. Do not add FAQPage markup to any other page.
 - *Wikidata Q-IDs, GBP CID, social handles* — not yet verified; add to `sameAs` in
   `node_business()` (build.py) once the real profiles exist.
 

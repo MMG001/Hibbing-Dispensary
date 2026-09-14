@@ -170,10 +170,12 @@ def node_webpage(filename, title, desc, og_image, page_type="WebPage", main_enti
         n["mainEntity"] = {"@id": main_entity}
     return n
 
-def build_graph(filename, title, desc, og_image, page_type, crumbs, svc_level, extra_nodes=None):
-    graph = [node_website(), node_business(), node_webpage(
-        filename, title, desc, og_image, page_type,
-        main_entity=(extra_nodes[0]["@id"] if extra_nodes else None)),
+def build_graph(filename, title, desc, og_image, page_type, crumbs, svc_level, extra_nodes=None, webpage_props=None):
+    wp = node_webpage(filename, title, desc, og_image, page_type,
+        main_entity=(extra_nodes[0]["@id"] if extra_nodes else None))
+    if webpage_props:
+        wp.update(webpage_props)
+    graph = [node_website(), node_business(), wp,
         node_breadcrumb(filename, crumbs)] + service_nodes(svc_level) + (extra_nodes or [])
     return {"@context": "https://schema.org", "@graph": graph}
 
@@ -262,7 +264,16 @@ def header_nav(active=""):
         </div>
       </div>
       <a href="about.html" class="{cls('about')}">About</a>
-      <a href="contact.html" class="{cls('contact')}">Contact</a>
+      <div class="dropdown relative">
+        <a href="contact.html" class="{cls('contact')} inline-flex items-center gap-1">Contact
+          <span class="material-symbols-outlined text-base" aria-hidden="true">expand_more</span></a>
+        <div class="dropdown-menu absolute right-0 top-full pt-3 w-56">
+          <div class="bg-white rounded-xl shadow-modal border border-outline-soft/40 overflow-hidden py-2">
+            <a href="contact.html" class="block px-5 py-3 font-label text-sm font-semibold text-forest hover:bg-surface-low hover:text-forest-deep transition-colors">Visit &amp; Contact</a>
+            <a href="faq.html" class="block px-5 py-3 font-label text-sm font-semibold text-forest hover:bg-surface-low hover:text-forest-deep transition-colors">FAQ</a>
+          </div>
+        </div>
+      </div>
     </nav>
     <div class="flex items-center gap-3">
       <a href="shop.html" class="hidden sm:inline-flex items-center gap-2 bg-gold text-forest-deep font-label font-bold text-sm uppercase tracking-wider px-6 py-3 rounded-lg hover:shadow-pop hover:bg-gold-bright transition-all">
@@ -280,7 +291,10 @@ def header_nav(active=""):
       {"".join(f'<a href="{h}" class="block py-2 font-body text-sm text-white/80 hover:text-gold-bright">{l}</a>' for h, l in EDU_LINKS)}
     </div>
     <a href="about.html" class="block py-3 font-label font-semibold text-white uppercase tracking-wider text-sm border-b border-forest/60">About</a>
-    <a href="contact.html" class="block py-3 font-label font-semibold text-white uppercase tracking-wider text-sm border-b border-forest/60">Contact</a>
+    <a href="contact.html" class="block py-3 font-label font-semibold text-white uppercase tracking-wider text-sm">Contact</a>
+    <div class="pl-4 border-l-2 border-gold/50 mb-2">
+      <a href="faq.html" class="block py-2 font-body text-sm text-white/80 hover:text-gold-bright">FAQ</a>
+    </div>
     <a href="shop.html" class="mt-4 inline-flex items-center gap-2 bg-gold text-forest-deep font-label font-bold text-sm uppercase tracking-wider px-6 py-3 rounded-lg">Shop Now</a>
   </div>
 </header>
@@ -304,6 +318,7 @@ FOOTER = """
         <li><a href="education.html" class="hover:text-gold-bright transition-colors">Cannabis Education</a></li>
         <li><a href="about.html" class="hover:text-gold-bright transition-colors">Our Story</a></li>
         <li><a href="contact.html" class="hover:text-gold-bright transition-colors">Visit Us</a></li>
+        <li><a href="faq.html" class="hover:text-gold-bright transition-colors">FAQ</a></li>
       </ul>
     </div>
     <div>
@@ -371,10 +386,10 @@ def clean_links(html):
     return html
 
 def page(filename, title, desc, active, body, og_image="images/THC-Cannabis-Hero.jpg",
-         page_type="WebPage", crumbs=None, svc_level="stub", extra_nodes=None):
+         page_type="WebPage", crumbs=None, svc_level="stub", extra_nodes=None, webpage_props=None):
     crumbs = crumbs or ([("Home", SITE_URL + "/")] if filename == "index.html"
         else [("Home", SITE_URL + "/"), (title.split(" — ")[0].split(" | ")[0], url_of(filename))])
-    graph = build_graph(filename, title, desc, og_image, page_type, crumbs, svc_level, extra_nodes)
+    graph = build_graph(filename, title, desc, og_image, page_type, crumbs, svc_level, extra_nodes, webpage_props)
     hero_pages = filename not in ("privacy-policy.html", "terms.html", "equal-opportunity.html", "sitemap.html")
     html = head(title, desc, filename, og_image, graph, preload_hero=hero_pages) + header_nav(active) + body + FOOTER
     html = html.replace("BUILDV_PLACEHOLDER", BUILD_V)
@@ -995,6 +1010,69 @@ page("contact.html", "Visit Our Cannabis Dispensary in Hibbing, MN | Contact",
      "Visit Hibbing Dispensary at 302 E Howard Street in downtown Hibbing, MN. Hours, directions, phone, email, and lab certificate requests. Open 7 days, 21+.",
      "contact", contact_body, "images/THC-Cannabis-Store-02.jpg", page_type="ContactPage")
 
+
+# ============================================================ FAQ
+# Q&A data is the single source for both the visible page and the
+# FAQPage schema (v2 rule: markup must mirror visible content).
+FAQS = [
+    ("Do I need to be 21 to shop at Hibbing Dispensary?",
+     "Yes. Minnesota law requires all customers to be 21 or older with a valid government-issued ID. We check every ID at the door, every visit — no exceptions."),
+    ("What forms of payment do you accept?",
+     "We accept cash and debit cards, and there is an ATM on-site. Due to federal banking rules, credit cards are not accepted at cannabis dispensaries."),
+    ("Can I order ahead for pickup?",
+     "Yes. Order through our online menu and your order is typically ready for in-store pickup in about 15 minutes. Bring the same valid 21+ ID you used to order."),
+    ("What products do you carry?",
+     "We stock a curated variety of lab-tested cannabis: craft flower, edibles and gummies, concentrates and oils, vaporizers and cartridges, pre-rolls, tinctures, and topicals."),
+    ("I'm new to cannabis. How much should I take?",
+     "Start low and go slow. For edibles, begin with 2 to 5 mg of THC and wait at least two hours before taking more, since onset is slow and effects can last several hours. For flower or vapes, take one small inhalation and wait 10 to 15 minutes. Our budtenders are happy to help you find the right starting dose."),
+    ("Are your products lab-tested?",
+     "Yes. Every product on our shelf is tested by a licensed laboratory for potency and purity, and certificates of analysis are available on request — just ask a budtender or email us."),
+    ("How much cannabis can I legally possess in Minnesota?",
+     "Minnesota's adult-use law sets possession limits for public and home storage. Limits can change as rules are updated, so check the current statutes at the Minnesota Office of Cannabis Management or Minnesota Statutes Chapter 342, or read our plain-English cannabis laws guide."),
+    ("Where am I allowed to consume cannabis?",
+     "On private property with the owner's permission. Consumption is not allowed in public places, schools, or vehicles, and driving under the influence of cannabis is illegal."),
+    ("Do you offer delivery?",
+     "Not yet — we currently offer in-store shopping and order-ahead pickup. Join our newsletter or follow us for updates as our services grow."),
+    ("What cities do you serve?",
+     "We're located at 302 E Howard Street in downtown Hibbing and proudly serve Iron Range neighbors within about 10 miles, including Chisholm, Buhl, and Keewatin."),
+]
+
+faq_items_html = "".join(f"""
+      <details class="group bg-white rounded-xl shadow-card border border-outline-soft/30 overflow-hidden">
+        <summary class="flex items-center justify-between gap-4 cursor-pointer list-none px-6 py-5 font-display font-bold text-lg text-forest-deep hover:text-forest [&::-webkit-details-marker]:hidden">
+          {q}
+          <span class="material-symbols-outlined text-gold shrink-0 transition-transform group-open:rotate-180" aria-hidden="true">expand_more</span>
+        </summary>
+        <p class="px-6 pb-6 text-ink-soft leading-relaxed">{a}</p>
+      </details>""" for q, a in FAQS)
+
+faq_body = f"""
+<main id="main">
+{hero_banner("THC-Cannabis-Store-03.jpg", "Good Questions", "Frequently Asked Questions", "Straight answers about shopping with us, dosing, payment, and Minnesota cannabis rules.")}
+<section class="py-16 bg-surface">
+  <div class="mx-auto max-w-3xl px-4 md:px-8">
+    <div class="space-y-4">{faq_items_html}</div>
+    <div class="mt-14 bg-forest rounded-2xl p-8 text-white flex flex-col sm:flex-row items-center justify-between gap-6">
+      <div>
+        <h2 class="font-display font-bold text-xl mb-1">Didn't find your answer?</h2>
+        <p class="text-white/75 text-sm">Ask us directly — no question is too basic, and our <a href="education.html" class="text-gold-bright font-semibold underline decoration-gold decoration-2 underline-offset-2 hover:text-white">education hub</a> goes deeper on every topic.</p>
+      </div>
+      <a href="contact.html" class="shrink-0 bg-gold text-forest-deep font-label font-bold uppercase tracking-wider text-xs px-6 py-3 rounded-lg hover:bg-gold-bright transition-colors">Contact Us</a>
+    </div>
+  </div>
+</section>
+</main>
+"""
+faq_schema_props = {"mainEntity": [
+    {"@type": "Question", "name": q, "acceptedAnswer": {"@type": "Answer", "text": a}}
+    for q, a in FAQS]}
+page("faq.html", "Dispensary FAQ | Hibbing Dispensary, Hibbing MN",
+     "Answers to common questions about shopping at Hibbing Dispensary: 21+ ID rules, cash and debit payment, order-ahead pickup, dosing for beginners, lab testing, and Minnesota cannabis law.",
+     "contact", faq_body, "images/THC-Cannabis-Store-03.jpg",
+     page_type="FAQPage",
+     crumbs=[("Home", SITE_URL + "/"), ("Contact", url_of("contact.html")), ("FAQ", url_of("faq.html"))],
+     webpage_props=faq_schema_props)
+
 # ============================================================ LEGAL PAGES
 def legal_page(filename, title, intro, sections):
     body_sections = ""
@@ -1084,14 +1162,14 @@ ALL_PAGES = [
   ("cannabis-101.html", "Cannabis 101"), ("cannabis-for-beginners.html", "Cannabis for Beginners"),
   ("cannabis-strains.html", "Cannabis Strains"), ("cbd-vs-thc.html", "CBD vs THC"),
   ("benefits-of-cannabis.html", "Benefits of Cannabis"), ("cannabis-laws.html", "Cannabis Laws"),
-  ("about.html", "About Us"), ("contact.html", "Contact"),
+  ("about.html", "About Us"), ("contact.html", "Contact"), ("faq.html", "FAQ"),
   ("privacy-policy.html", "Privacy Policy"), ("terms.html", "Terms &amp; Conditions"),
   ("equal-opportunity.html", "Equal Opportunity Employer"), ("sitemap.html", "Sitemap"),
 ]
 groups = [
-  ("Main", ALL_PAGES[0:3] + ALL_PAGES[9:11]),
+  ("Main", ALL_PAGES[0:3] + ALL_PAGES[9:12]),
   ("Education", ALL_PAGES[3:9]),
-  ("Legal", ALL_PAGES[11:15]),
+  ("Legal", ALL_PAGES[12:16]),
 ]
 sitemap_cols = "".join(f"""
     <div>

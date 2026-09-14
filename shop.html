@@ -25,7 +25,7 @@
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin/>
 <link href="https://fonts.googleapis.com/css2?family=DM+Sans:ital,opsz,wght@0,9..40,400..700;1,9..40,400..700&family=Space+Grotesk:wght@400..700&family=Syne:wght@600..800&display=swap" rel="stylesheet"/>
 <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@24,400,0,0&icon_names=air,arrow_forward,call,close,cookie,diversity_3,expand_more,group,home_work,local_mall,location_on,mail,menu,schedule,school,science,shopping_bag,spa,storefront,verified,water_drop&display=block" rel="stylesheet"/>
-<link href="/css/app.css?v=1789409428" rel="stylesheet"/>
+<link href="/css/app.css?v=1789409572" rel="stylesheet"/>
 <style>
   .material-symbols-outlined { font-variation-settings: 'FILL' 0, 'wght' 400; }
   html { scroll-behavior: smooth; }
@@ -60,7 +60,16 @@
         </div>
       </div>
       <a href="/about" class="font-label text-sm font-semibold tracking-wider uppercase transition-colors text-white hover:text-gold-bright">About</a>
-      <a href="/contact" class="font-label text-sm font-semibold tracking-wider uppercase transition-colors text-white hover:text-gold-bright">Contact</a>
+      <div class="dropdown relative">
+        <a href="/contact" class="font-label text-sm font-semibold tracking-wider uppercase transition-colors text-white hover:text-gold-bright inline-flex items-center gap-1">Contact
+          <span class="material-symbols-outlined text-base" aria-hidden="true">expand_more</span></a>
+        <div class="dropdown-menu absolute right-0 top-full pt-3 w-56">
+          <div class="bg-white rounded-xl shadow-modal border border-outline-soft/40 overflow-hidden py-2">
+            <a href="/contact" class="block px-5 py-3 font-label text-sm font-semibold text-forest hover:bg-surface-low hover:text-forest-deep transition-colors">Visit &amp; Contact</a>
+            <a href="/faq" class="block px-5 py-3 font-label text-sm font-semibold text-forest hover:bg-surface-low hover:text-forest-deep transition-colors">FAQ</a>
+          </div>
+        </div>
+      </div>
     </nav>
     <div class="flex items-center gap-3">
       <a href="/shop" class="hidden sm:inline-flex items-center gap-2 bg-gold text-forest-deep font-label font-bold text-sm uppercase tracking-wider px-6 py-3 rounded-lg hover:shadow-pop hover:bg-gold-bright transition-all">
@@ -78,7 +87,10 @@
       <a href="/cannabis-101" class="block py-2 font-body text-sm text-white/80 hover:text-gold-bright">Cannabis 101</a><a href="/cannabis-for-beginners" class="block py-2 font-body text-sm text-white/80 hover:text-gold-bright">Cannabis for Beginners</a><a href="/cannabis-strains" class="block py-2 font-body text-sm text-white/80 hover:text-gold-bright">Cannabis Strains</a><a href="/cbd-vs-thc" class="block py-2 font-body text-sm text-white/80 hover:text-gold-bright">CBD vs THC</a><a href="/benefits-of-cannabis" class="block py-2 font-body text-sm text-white/80 hover:text-gold-bright">Benefits of Cannabis</a><a href="/cannabis-laws" class="block py-2 font-body text-sm text-white/80 hover:text-gold-bright">Cannabis Laws</a>
     </div>
     <a href="/about" class="block py-3 font-label font-semibold text-white uppercase tracking-wider text-sm border-b border-forest/60">About</a>
-    <a href="/contact" class="block py-3 font-label font-semibold text-white uppercase tracking-wider text-sm border-b border-forest/60">Contact</a>
+    <a href="/contact" class="block py-3 font-label font-semibold text-white uppercase tracking-wider text-sm">Contact</a>
+    <div class="pl-4 border-l-2 border-gold/50 mb-2">
+      <a href="/faq" class="block py-2 font-body text-sm text-white/80 hover:text-gold-bright">FAQ</a>
+    </div>
     <a href="/shop" class="mt-4 inline-flex items-center gap-2 bg-gold text-forest-deep font-label font-bold text-sm uppercase tracking-wider px-6 py-3 rounded-lg">Shop Now</a>
   </div>
 </header>
@@ -186,6 +198,7 @@
         <li><a href="/education" class="hover:text-gold-bright transition-colors">Cannabis Education</a></li>
         <li><a href="/about" class="hover:text-gold-bright transition-colors">Our Story</a></li>
         <li><a href="/contact" class="hover:text-gold-bright transition-colors">Visit Us</a></li>
+        <li><a href="/faq" class="hover:text-gold-bright transition-colors">FAQ</a></li>
       </ul>
     </div>
     <div>
@@ -238,6 +251,6 @@
   </div>
 </div>
 
-<script src="js/main.js?v=1789409428" defer></script>
+<script src="js/main.js?v=1789409572" defer></script>
 </body>
 </html>
