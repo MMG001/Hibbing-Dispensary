@@ -75,3 +75,14 @@ automatically for the underlying `.html` files. Preview locally with
 
 **Before GSC submission:** replace the placeholder phone in `node_business()` and set the final
 domain in `SITE_URL`, then re-run `python3 build.py`.
+
+## Performance (Lighthouse fixes, Sept 2026)
+- **Tailwind is compiled statically** to `css/app.css` (~25 KB) — the render-blocking 126 KB
+  CDN dev script is gone. After editing any HTML/classes, run `./build.sh` (or
+  `npx tailwindcss -i input.css -o css/app.css --minify`) to regenerate.
+- **Material Symbols is subset** via `icon_names=` to only the icons used (was a 1.1 MB woff2).
+  If you add a new icon, add its name to `ICONS` in `build.py` (alphabetical) and rebuild.
+- Body fonts trimmed to used weights (DM Sans 400–700, Space Grotesk 400–700, Syne 600–800).
+- LCP hero images are preloaded with `fetchpriority="high"`; all others lazy-load with
+  `srcset` 640w variants and explicit width/height (no CLS).
+- CSS/JS URLs carry a `?v=<build stamp>` for cache busting on deploy.

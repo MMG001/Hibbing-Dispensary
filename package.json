@@ -1,0 +1,24 @@
+{
+  "name": "site",
+  "version": "1.0.0",
+  "description": "Static multi-page website for Hibbing Dispensary (Hibbing, MN). Built with Tailwind CSS (CDN), Syne / DM Sans / Space Grotesk typography, and the deep-forest-green + gold design system.",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/MMG001/Hibbing-Dispensary.git"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/MMG001/Hibbing-Dispensary/issues"
+  },
+  "homepage": "https://github.com/MMG001/Hibbing-Dispensary#readme",
+  "devDependencies": {
+    "@tailwindcss/forms": "^0.5.11",
+    "tailwindcss": "^3.4.19"
+  }
+}

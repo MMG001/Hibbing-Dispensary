@@ -10,42 +10,25 @@ SITE_URL = "https://hibbing-dispensary.pages.dev"  # update after custom domain
 
 with open(os.path.join(OUT, "images", "metadata.json")) as f:
     ALT = json.load(f)
+with open(os.path.join(OUT, "images", "dimensions.json")) as f:
+    DIMS = json.load(f)
+import time
+BUILD_V = str(int(time.time()))
 
 LINK_CLS = "text-forest font-semibold underline decoration-gold decoration-2 underline-offset-2 hover:text-forest-deep"
 def L(href, text):
     return f'<a href="{href}" class="{LINK_CLS}">{text}</a>'
 
 def img(name, cls="", loading="lazy"):
-    return f'<img src="images/{name}" alt="{ALT.get(name, name)}" title="{ALT.get(name, name)}" class="{cls}" loading="{loading}"/>'
+    w, h = DIMS.get(name, [None, None])
+    dim = f' width="{w}" height="{h}"' if w else ""
+    var = name[:-4] + "-640.jpg"
+    if loading == "lazy" and var in DIMS:
+        resp = f' srcset="/images/{var} 640w, /images/{name} {w}w" sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 33vw"'
+    else:
+        resp = ' fetchpriority="high"' if loading == "eager" else ""
+    return f'<img src="images/{name}" alt="{ALT.get(name, name)}" title="{ALT.get(name, name)}" class="{cls}" loading="{loading}"{dim}{resp}/>'
 
-TAILWIND_CONFIG = """
-    tailwind.config = {
-      theme: {
-        extend: {
-          colors: {
-            surface: "#fbf9f6", "surface-low": "#f5f3f0", "surface-mid": "#efeeeb",
-            "surface-high": "#eae8e5", cream: "#FAF8F5",
-            forest: "#1A4329", "forest-deep": "#012d15", "forest-night": "#0E2616",
-            gold: "#D4AF37", "gold-bright": "#fed65b", "gold-soft": "#ffe088",
-            bark: "#4A2E18", "bark-deep": "#39200b",
-            ink: "#1b1c1a", "ink-soft": "#414942",
-            outline: "#727971", "outline-soft": "#c1c8c0",
-          },
-          fontFamily: {
-            display: ["Syne", "sans-serif"],
-            body: ["'DM Sans'", "sans-serif"],
-            label: ["'Space Grotesk'", "sans-serif"],
-          },
-          boxShadow: {
-            card: "0 8px 24px -4px rgba(26, 65, 41, 0.08)",
-            pop: "0 16px 32px -6px rgba(74, 46, 24, 0.12)",
-            modal: "0 20px 40px -8px rgba(26, 65, 41, 0.22)",
-          },
-          maxWidth: { shell: "1360px" },
-        },
-      },
-    };
-"""
 
 # ============================================================
 # v2 INTERLINKED JSON-LD ENTITY GRAPH
@@ -194,8 +177,12 @@ def build_graph(filename, title, desc, og_image, page_type, crumbs, svc_level, e
         node_breadcrumb(filename, crumbs)] + service_nodes(svc_level) + (extra_nodes or [])
     return {"@context": "https://schema.org", "@graph": graph}
 
-def head(title, desc, canonical, og_image="images/THC-Cannabis-Hero.jpg", graph=None):
+ICONS = "air,arrow_forward,call,close,cookie,diversity_3,expand_more,group,home_work,local_mall,location_on,mail,menu,schedule,school,science,shopping_bag,spa,storefront,verified,water_drop"
+ICONS_URL = "https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@24,400,0,0&icon_names=" + ICONS + "&display=block"
+
+def head(title, desc, canonical, og_image="images/THC-Cannabis-Hero.jpg", graph=None, preload_hero=True):
     canon = url_of(canonical)
+    preload = f'<link rel="preload" as="image" href="/{og_image}" fetchpriority="high"/>\n' if preload_hero else ""
     jsonld = f'<script type="application/ld+json">{json.dumps(graph)}</script>\n' if graph else ""
     return f"""<!DOCTYPE html>
 <html lang="en">
@@ -218,12 +205,11 @@ def head(title, desc, canonical, og_image="images/THC-Cannabis-Hero.jpg", graph=
 <meta name="twitter:description" content="{desc}"/>
 <meta name="twitter:image" content="{SITE_URL}/{og_image}"/>
 {jsonld}
-<link rel="preconnect" href="https://fonts.googleapis.com"/>
+{preload}<link rel="preconnect" href="https://fonts.googleapis.com"/>
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin/>
-<link href="https://fonts.googleapis.com/css2?family=DM+Sans:ital,opsz,wght@0,9..40,100..1000;1,9..40,100..1000&family=Space+Grotesk:wght@300..700&family=Syne:wght@400..800&display=swap" rel="stylesheet"/>
-<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap" rel="stylesheet"/>
-<script src="https://cdn.tailwindcss.com?plugins=forms"></script>
-<script>{TAILWIND_CONFIG}</script>
+<link href="https://fonts.googleapis.com/css2?family=DM+Sans:ital,opsz,wght@0,9..40,400..700;1,9..40,400..700&family=Space+Grotesk:wght@400..700&family=Syne:wght@600..800&display=swap" rel="stylesheet"/>
+<link href="{ICONS_URL}" rel="stylesheet"/>
+<link href="/css/app.css?v={BUILD_V}" rel="stylesheet"/>
 <style>
   .material-symbols-outlined {{ font-variation-settings: 'FILL' 0, 'wght' 400; }}
   html {{ scroll-behavior: smooth; }}
@@ -370,7 +356,7 @@ FOOTER = """
   </div>
 </div>
 
-<script src="js/main.js"></script>
+<script src="js/main.js?v=BUILDV_PLACEHOLDER" defer></script>
 </body>
 </html>
 """
@@ -389,7 +375,9 @@ def page(filename, title, desc, active, body, og_image="images/THC-Cannabis-Hero
     crumbs = crumbs or ([("Home", SITE_URL + "/")] if filename == "index.html"
         else [("Home", SITE_URL + "/"), (title.split(" — ")[0].split(" | ")[0], url_of(filename))])
     graph = build_graph(filename, title, desc, og_image, page_type, crumbs, svc_level, extra_nodes)
-    html = head(title, desc, filename, og_image, graph) + header_nav(active) + body + FOOTER
+    hero_pages = filename not in ("privacy-policy.html", "terms.html", "equal-opportunity.html", "sitemap.html")
+    html = head(title, desc, filename, og_image, graph, preload_hero=hero_pages) + header_nav(active) + body + FOOTER
+    html = html.replace("BUILDV_PLACEHOLDER", BUILD_V)
     html = clean_links(html)
     with open(os.path.join(OUT, filename), "w") as f:
         f.write(html)
@@ -400,7 +388,7 @@ def hero_banner(image, eyebrow, title, sub=""):
     subhtml = f'<p class="text-white/85 text-lg max-w-2xl">{sub}</p>' if sub else ""
     return f"""
 <section class="relative overflow-hidden bg-forest-deep">
-  <img src="images/{image}" alt="{ALT.get(image, image)}" title="{ALT.get(image, image)}" class="absolute inset-0 h-full w-full object-cover" loading="eager"/>
+  <img src="images/{image}" alt="{ALT.get(image, image)}" title="{ALT.get(image, image)}" class="absolute inset-0 h-full w-full object-cover" loading="eager" fetchpriority="high" width="{DIMS.get(image,[1568,441])[0]}" height="{DIMS.get(image,[1568,441])[1]}"/>
   <div class="absolute inset-0 hero-fade" aria-hidden="true"></div>
   <div class="relative mx-auto max-w-shell px-4 md:px-10 py-20 md:py-28">
     <span class="sticker inline-block bg-gold text-forest-deep font-label font-bold text-xs uppercase tracking-widest px-4 py-1.5 rounded-full mb-5">{eyebrow}</span>
