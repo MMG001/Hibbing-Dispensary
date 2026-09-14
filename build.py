@@ -47,50 +47,156 @@ TAILWIND_CONFIG = """
     };
 """
 
-# ---- Triple-semantic entity schema: ENTITY (Store) + SERVICES (OfferCatalog) + AUDIENCE/INTENT (audience, areaServed, keywords)
-ORG_SCHEMA = {
-  "@context": "https://schema.org",
-  "@type": ["Store", "LocalBusiness"],
-  "@id": SITE_URL + "/#organization",
-  "name": "Hibbing Dispensary",
-  "additionalType": "https://en.wikipedia.org/wiki/Cannabis_retail",
-  "description": "Hibbing Dispensary is a licensed adult-use cannabis dispensary in Hibbing, Minnesota, selling lab-tested cannabis flower, edibles, concentrates, vapes, pre-rolls, tinctures, and topicals to adults 21 and over.",
-  "slogan": "Legal cannabis for sale — order ahead, pick up in store.",
-  "url": SITE_URL + "/",
-  "logo": SITE_URL + "/images/THC-Cannabis-Hero.jpg",
-  "image": SITE_URL + "/images/THC-Cannabis-Store.jpg",
-  "foundingDate": "2026",
-  "address": {"@type": "PostalAddress", "streetAddress": "302 E Howard Street",
-    "addressLocality": "Hibbing", "addressRegion": "MN", "postalCode": "55746", "addressCountry": "US"},
-  "geo": {"@type": "GeoCoordinates", "latitude": 47.4272, "longitude": -92.9377},
-  "areaServed": {"@type": "GeoCircle", "name": "Hibbing, MN and surrounding communities within 5 miles",
-    "geoMidpoint": {"@type": "GeoCoordinates", "latitude": 47.4272, "longitude": -92.9377}, "geoRadius": "8047"},
-  "telephone": "+1-218-000-0000",
-  "email": "hello@hibbingdispensary.com",
-  "priceRange": "$$",
-  "paymentAccepted": "Cash, Debit",
-  "currenciesAccepted": "USD",
-  "openingHoursSpecification": [
-    {"@type": "OpeningHoursSpecification", "dayOfWeek": ["Monday","Tuesday","Wednesday","Thursday","Friday","Saturday"], "opens": "10:00", "closes": "21:00"},
-    {"@type": "OpeningHoursSpecification", "dayOfWeek": "Sunday", "opens": "11:00", "closes": "18:00"}],
-  "audience": {"@type": "PeopleAudience", "audienceType": "Adult cannabis consumers", "suggestedMinAge": 21,
-    "geographicArea": {"@type": "AdministrativeArea", "name": "Hibbing, Minnesota"}},
-  "keywords": "cannabis dispensary, Hibbing MN, legal cannabis for sale, order ahead cannabis, THC, CBD, edibles, flower, concentrates",
-  "hasOfferCatalog": {"@type": "OfferCatalog", "name": "Cannabis Menu", "itemListElement": [
-    {"@type": "OfferCatalog", "name": "Cannabis Flower"},
-    {"@type": "OfferCatalog", "name": "Edibles & Gummies"},
-    {"@type": "OfferCatalog", "name": "Concentrates & Oils"},
-    {"@type": "OfferCatalog", "name": "Vaporizers & Cartridges"},
-    {"@type": "OfferCatalog", "name": "Pre-Rolls"},
-    {"@type": "OfferCatalog", "name": "Tinctures & Topicals"}]},
-  "knowsAbout": ["Cannabis", "THC", "CBD", "Cannabis strains", "Edibles", "Concentrates", "Tinctures", "Topicals", "Minnesota cannabis law"],
-  "sameAs": ["https://github.com/MMG001/Hibbing-Dispensary"]
-}
+# ============================================================
+# v2 INTERLINKED JSON-LD ENTITY GRAPH
+# One @graph per page; all nodes cross-referenced by @id.
+# Machine IDs (Wikipedia sameAs) verified 2026-09.
+# ============================================================
+def url_of(filename):
+    return SITE_URL + "/" if filename == "index.html" else SITE_URL + "/" + filename.rsplit(".html", 1)[0]
 
-def head(title, desc, canonical, og_image="images/THC-Cannabis-Hero.jpg", extra_schema=None):
-    canon = SITE_URL + "/" + ("" if canonical == "index.html" else canonical)
-    schemas = [ORG_SCHEMA] + (extra_schema or [])
-    jsonld = "".join(f'<script type="application/ld+json">{json.dumps(s)}</script>\n' for s in schemas)
+WIKI = {
+    "Hibbing": "https://en.wikipedia.org/wiki/Hibbing,_Minnesota",
+    "Chisholm": "https://en.wikipedia.org/wiki/Chisholm,_Minnesota",
+    "Buhl": "https://en.wikipedia.org/wiki/Buhl,_Minnesota",
+    "Keewatin": "https://en.wikipedia.org/wiki/Keewatin,_Minnesota",
+    "StLouisCounty": "https://en.wikipedia.org/wiki/St._Louis_County,_Minnesota",
+    "ItascaCounty": "https://en.wikipedia.org/wiki/Itasca_County,_Minnesota",
+    "Minnesota": "https://en.wikipedia.org/wiki/Minnesota",
+}
+GEO = {"@type": "GeoCoordinates", "latitude": 47.4272, "longitude": -92.9377}
+GEO_CIRCLE = {"@type": "GeoCircle",
+    "description": "10-mile service radius anchored on Hibbing, Minnesota",
+    "geoMidpoint": GEO, "geoRadius": "16093"}
+AREA_SERVED = [
+    GEO_CIRCLE,
+    {"@type": "City", "name": "Hibbing", "sameAs": WIKI["Hibbing"]},
+    {"@type": "City", "name": "Chisholm", "sameAs": WIKI["Chisholm"]},
+    {"@type": "City", "name": "Buhl", "sameAs": WIKI["Buhl"]},
+    {"@type": "City", "name": "Keewatin", "sameAs": WIKI["Keewatin"]},
+    {"@type": "AdministrativeArea", "name": "St. Louis County, Minnesota", "sameAs": WIKI["StLouisCounty"]},
+    {"@type": "AdministrativeArea", "name": "Itasca County, Minnesota", "sameAs": WIKI["ItascaCounty"]},
+    {"@type": "AdministrativeArea", "name": "Minnesota", "sameAs": WIKI["Minnesota"]},
+]
+
+# Per-slug service metadata: (id-slug, name, serviceType, blurb, wikipedia concept)
+SERVICES = [
+    ("flower", "Cannabis Flower", "Cannabis flower retail",
+     "Hand-trimmed craft cannabis strains across indica, sativa, and hybrid, jarred for freshness.",
+     "https://en.wikipedia.org/wiki/Cannabis_(drug)"),
+    ("edibles", "Edibles & Gummies", "Cannabis edibles retail",
+     "Precisely dosed THC gummies and infused edibles with slow onset and long-lasting effects.",
+     "https://en.wikipedia.org/wiki/Cannabis_edible"),
+    ("concentrates", "Concentrates & Oils", "Cannabis concentrates retail",
+     "Live rosin, crumble, and golden cannabis extracts for full-spectrum potency.",
+     "https://en.wikipedia.org/wiki/Cannabis_concentrate"),
+    ("vaporizers", "Vaporizers & Cartridges", "Cannabis vaporizer retail",
+     "Cartridges, devices, and hardware for clean, fast-onset cannabis inhalation.",
+     "https://en.wikipedia.org/wiki/Vaporizer_(inhalation_device)"),
+    ("pre-rolls", "Pre-Rolls", "Cannabis pre-roll retail",
+     "Ready-to-enjoy pre-rolled cannabis joints crafted from whole flower.",
+     "https://en.wikipedia.org/wiki/Joint_(cannabis)"),
+    ("tinctures-topicals", "Tinctures & Topicals", "Cannabis tinctures and topicals retail",
+     "Sublingual cannabis tinctures and skin-applied balms for smoke-free, targeted use.",
+     "https://en.wikipedia.org/wiki/Tincture_of_cannabis"),
+]
+SVC_ID = lambda slug: SITE_URL + "/shop#service-" + slug
+
+def service_nodes(level):
+    """Three-level Service rule: 'card' where blurbs are visible (home/shop), 'stub' elsewhere."""
+    nodes = []
+    for slug, name, stype, blurb, concept in SERVICES:
+        n = {"@type": "Service", "@id": SVC_ID(slug), "name": name,
+             "url": SITE_URL + "/shop", "provider": {"@id": SITE_URL + "/#business"}}
+        if level == "card":
+            n.update({"serviceType": stype, "description": blurb,
+                      "areaServed": GEO_CIRCLE, "inLanguage": "en-US",
+                      "about": {"@type": "Thing", "name": name, "sameAs": concept}})
+        nodes.append(n)
+    return nodes
+
+def node_business():
+    return {
+        "@type": ["Store", "LocalBusiness"],
+        "@id": SITE_URL + "/#business",
+        "name": "Hibbing Dispensary",
+        "description": "Hibbing Dispensary is a licensed adult-use cannabis dispensary in Hibbing, Minnesota, selling lab-tested cannabis flower, edibles, concentrates, vapes, pre-rolls, tinctures, and topicals to adults 21 and over.",
+        "slogan": "Legal cannabis for sale — order ahead, pick up in store.",
+        "url": SITE_URL + "/",
+        "logo": SITE_URL + "/images/THC-Cannabis-Hero.jpg",
+        "image": SITE_URL + "/images/THC-Cannabis-Store.jpg",
+        "foundingDate": "2026",
+        "address": {"@type": "PostalAddress", "streetAddress": "302 E Howard Street",
+            "addressLocality": "Hibbing", "addressRegion": "MN", "postalCode": "55746", "addressCountry": "US"},
+        "geo": GEO,
+        "hasMap": "https://www.google.com/maps/search/?api=1&query=302+E+Howard+Street+Hibbing+MN+55746",
+        "areaServed": AREA_SERVED,
+        "telephone": "+1-218-000-0000",
+        "email": "hello@hibbingdispensary.com",
+        "priceRange": "$$",
+        "paymentAccepted": "Cash, Debit",
+        "currenciesAccepted": "USD",
+        "openingHoursSpecification": [
+            {"@type": "OpeningHoursSpecification", "dayOfWeek": ["Monday","Tuesday","Wednesday","Thursday","Friday","Saturday"], "opens": "10:00", "closes": "21:00"},
+            {"@type": "OpeningHoursSpecification", "dayOfWeek": "Sunday", "opens": "11:00", "closes": "18:00"}],
+        "audience": {"@type": "PeopleAudience", "audienceType": "Adult cannabis consumers", "suggestedMinAge": 21,
+            "geographicArea": {"@type": "AdministrativeArea", "name": "Hibbing, Minnesota", "sameAs": WIKI["Hibbing"]}},
+        "keywords": "cannabis dispensary, Hibbing MN, legal cannabis for sale, order ahead cannabis, THC, CBD, edibles, flower, concentrates",
+        "knowsAbout": [
+            {"@type": "Thing", "name": "Cannabis", "sameAs": "https://en.wikipedia.org/wiki/Cannabis_(drug)"},
+            {"@type": "Thing", "name": "THC", "sameAs": "https://en.wikipedia.org/wiki/Tetrahydrocannabinol"},
+            {"@type": "Thing", "name": "CBD", "sameAs": "https://en.wikipedia.org/wiki/Cannabidiol"},
+            {"@type": "Thing", "name": "Minnesota cannabis law", "sameAs": "https://www.revisor.mn.gov/statutes/cite/342.09"}],
+        "hasOfferCatalog": {"@type": "OfferCatalog", "name": "Cannabis Menu",
+            "itemListElement": [{"@id": SVC_ID(s[0])} for s in SERVICES]},
+        "sameAs": ["https://github.com/MMG001/Hibbing-Dispensary"],
+        "potentialAction": [
+            {"@type": "OrderAction", "name": "Order ahead for in-store pickup",
+             "target": {"@type": "EntryPoint", "urlTemplate": SITE_URL + "/shop", "inLanguage": "en-US",
+                "actionPlatform": ["http://schema.org/DesktopWebPlatform", "http://schema.org/MobileWebPlatform"]}},
+            {"@type": "AskAction", "name": "Send an inquiry",
+             "target": {"@type": "EntryPoint", "urlTemplate": SITE_URL + "/contact#contact-form", "inLanguage": "en-US",
+                "actionPlatform": ["http://schema.org/DesktopWebPlatform", "http://schema.org/MobileWebPlatform"]},
+             "name-input": {"@type": "PropertyValueSpecification", "valueName": "name", "valueRequired": True},
+             "email-input": {"@type": "PropertyValueSpecification", "valueName": "email", "valueRequired": True},
+             "message-input": {"@type": "PropertyValueSpecification", "valueName": "message", "valueRequired": True}},
+            {"@type": "CommunicateAction", "name": "Call the dispensary",
+             "target": {"@type": "EntryPoint", "urlTemplate": "tel:+12180000000",
+                "actionPlatform": ["http://schema.org/DesktopWebPlatform", "http://schema.org/MobileWebPlatform"]}},
+            {"@type": "CommunicateAction", "name": "Email the dispensary",
+             "target": {"@type": "EntryPoint", "urlTemplate": "mailto:hello@hibbingdispensary.com",
+                "actionPlatform": ["http://schema.org/DesktopWebPlatform", "http://schema.org/MobileWebPlatform"]}},
+        ],
+    }
+
+def node_website():
+    return {"@type": "WebSite", "@id": SITE_URL + "/#website", "name": "Hibbing Dispensary",
+            "url": SITE_URL + "/", "publisher": {"@id": SITE_URL + "/#business"}, "inLanguage": "en-US"}
+
+def node_breadcrumb(filename, crumbs):
+    items = [{"@type": "ListItem", "position": i + 1, "name": n, "item": u} for i, (n, u) in enumerate(crumbs)]
+    return {"@type": "BreadcrumbList", "@id": url_of(filename) + "#breadcrumb", "itemListElement": items}
+
+def node_webpage(filename, title, desc, og_image, page_type="WebPage", main_entity=None):
+    n = {"@type": page_type, "@id": url_of(filename) + "#webpage", "url": url_of(filename),
+         "name": title, "description": desc,
+         "isPartOf": {"@id": SITE_URL + "/#website"}, "about": {"@id": SITE_URL + "/#business"},
+         "breadcrumb": {"@id": url_of(filename) + "#breadcrumb"},
+         "primaryImageOfPage": SITE_URL + "/" + og_image, "inLanguage": "en-US"}
+    if main_entity:
+        n["mainEntity"] = {"@id": main_entity}
+    return n
+
+def build_graph(filename, title, desc, og_image, page_type, crumbs, svc_level, extra_nodes=None):
+    graph = [node_website(), node_business(), node_webpage(
+        filename, title, desc, og_image, page_type,
+        main_entity=(extra_nodes[0]["@id"] if extra_nodes else None)),
+        node_breadcrumb(filename, crumbs)] + service_nodes(svc_level) + (extra_nodes or [])
+    return {"@context": "https://schema.org", "@graph": graph}
+
+def head(title, desc, canonical, og_image="images/THC-Cannabis-Hero.jpg", graph=None):
+    canon = url_of(canonical)
+    jsonld = f'<script type="application/ld+json">{json.dumps(graph)}</script>\n' if graph else ""
     return f"""<!DOCTYPE html>
 <html lang="en">
 <head>
@@ -269,8 +375,22 @@ FOOTER = """
 </html>
 """
 
-def page(filename, title, desc, active, body, og_image="images/THC-Cannabis-Hero.jpg", extra_schema=None):
-    html = head(title, desc, filename, og_image, extra_schema) + header_nav(active) + body + FOOTER
+import re as _re
+def clean_links(html):
+    """Root-relative clean URLs so hrefs match canonicals/sitemap (Cloudflare Pages serves /about for about.html)."""
+    html = _re.sub(r'(href=["\'])index\.html', r'\1/', html)
+    html = _re.sub(r'(href=["\'])([a-z0-9\-]+)\.html', r'\1/\2', html)
+    html = html.replace('src="images/', 'src="/images/').replace('href="images/', 'href="/images/')
+    html = html.replace('src="js/main.js"', 'src="/js/main.js"')
+    return html
+
+def page(filename, title, desc, active, body, og_image="images/THC-Cannabis-Hero.jpg",
+         page_type="WebPage", crumbs=None, svc_level="stub", extra_nodes=None):
+    crumbs = crumbs or ([("Home", SITE_URL + "/")] if filename == "index.html"
+        else [("Home", SITE_URL + "/"), (title.split(" — ")[0].split(" | ")[0], url_of(filename))])
+    graph = build_graph(filename, title, desc, og_image, page_type, crumbs, svc_level, extra_nodes)
+    html = head(title, desc, filename, og_image, graph) + header_nav(active) + body + FOOTER
+    html = clean_links(html)
     with open(os.path.join(OUT, filename), "w") as f:
         f.write(html)
     print("built:", filename)
@@ -467,7 +587,7 @@ home_body = f"""
 """
 page("index.html", "Cannabis Dispensary in Hibbing, MN | Hibbing Dispensary",
      "Licensed cannabis dispensary in Hibbing, MN. Legal cannabis for sale — order ahead online for 15-minute pickup. Flower, edibles, concentrates & more. 21+.",
-     "home", home_body)
+     "home", home_body, svc_level="card")
 
 # ============================================================ SHOP
 shop_body = f"""
@@ -533,7 +653,7 @@ shop_body = f"""
 """
 page("shop.html", "Order Cannabis Online in Hibbing, MN | Hibbing Dispensary",
      "Shop our cannabis dispensary menu: flower, edibles, gummies, concentrates, vapes, pre-rolls, tinctures & topicals. Order ahead for in-store pickup in Hibbing, MN.",
-     "shop", shop_body, "images/THC-Cannabis-Store.jpg")
+     "shop", shop_body, "images/THC-Cannabis-Store.jpg", page_type="CollectionPage", svc_level="card")
 
 # ============================================================ EDUCATION HUB
 def edu_card(href, label, blurb, im):
@@ -566,7 +686,7 @@ edu_body = f"""
 """
 page("education.html", "Cannabis Education | Hibbing Dispensary, Hibbing MN",
      "Free cannabis education from Hibbing Dispensary: Cannabis 101, beginner guides, strains, CBD vs THC, benefits of cannabis, and Minnesota cannabis laws.",
-     "education", edu_body, "images/THC-Cannabis-101-Hero.jpg")
+     "education", edu_body, "images/THC-Cannabis-101-Hero.jpg", page_type="CollectionPage")
 
 # ============================================================ ARTICLE HELPERS
 def article(filename, hero_im, eyebrow, title, sub, sections, next_href, next_label):
@@ -580,15 +700,12 @@ def article(filename, hero_im, eyebrow, title, sub, sections, next_href, next_la
         <h3 class="font-display font-bold text-forest-deep group-hover:text-forest">{l}</h3>
         <span class="mt-2 inline-flex items-center gap-1 font-label font-semibold uppercase tracking-wider text-xs text-forest">Read guide<span class="material-symbols-outlined text-sm" aria-hidden="true">arrow_forward</span></span>
       </a>""" for h, l in related)
-    breadcrumb = {"@context": "https://schema.org", "@type": "BreadcrumbList", "itemListElement": [
-        {"@type": "ListItem", "position": 1, "name": "Home", "item": SITE_URL + "/"},
-        {"@type": "ListItem", "position": 2, "name": "Education", "item": SITE_URL + "/education.html"},
-        {"@type": "ListItem", "position": 3, "name": title, "item": SITE_URL + "/" + filename}]}
-    art_schema = {"@context": "https://schema.org", "@type": "Article", "headline": title, "description": sub,
+    crumbs = [("Home", SITE_URL + "/"), ("Education", url_of("education.html")), (title, url_of(filename))]
+    art_node = {"@type": "Article", "@id": url_of(filename) + "#article",
+        "headline": title, "description": sub,
         "image": SITE_URL + "/images/" + hero_im, "datePublished": "2026-09-14", "dateModified": "2026-09-14",
-        "author": {"@type": "Organization", "name": "Hibbing Dispensary", "@id": SITE_URL + "/#organization"},
-        "publisher": {"@id": SITE_URL + "/#organization"},
-        "mainEntityOfPage": SITE_URL + "/" + filename,
+        "author": {"@id": SITE_URL + "/#business"}, "publisher": {"@id": SITE_URL + "/#business"},
+        "mainEntityOfPage": {"@id": url_of(filename) + "#webpage"}, "inLanguage": "en-US",
         "audience": {"@type": "PeopleAudience", "audienceType": "Adult cannabis consumers", "suggestedMinAge": 21}}
     body = f"""
 <main id="main">
@@ -628,7 +745,7 @@ def article(filename, hero_im, eyebrow, title, sub, sections, next_href, next_la
 </section>
 </main>
 """
-    page(filename, f"{title} — Hibbing Dispensary", sub, "education", body, f"images/{hero_im}", [breadcrumb, art_schema])
+    page(filename, f"{title} — Hibbing Dispensary", sub, "education", body, f"images/{hero_im}", crumbs=crumbs, extra_nodes=[art_node])
 
 # ============================================================ CANNABIS 101
 article("cannabis-101.html", "THC-Cannabis-101-Hero.jpg", "Education · Cannabis 101",
@@ -821,7 +938,7 @@ about_body = f"""
 """
 page("about.html", "About Our Cannabis Dispensary | Hibbing, MN",
      "Hibbing Dispensary is a locally owned, OCM-licensed cannabis dispensary in Hibbing, Minnesota — lab-tested products, education-first budtenders, Iron Range roots.",
-     "about", about_body, "images/About-Us-page.jpg")
+     "about", about_body, "images/About-Us-page.jpg", page_type="AboutPage")
 
 # ============================================================ CONTACT
 contact_body = f"""
@@ -853,7 +970,7 @@ contact_body = f"""
   </div>
 </section>
 
-<section class="py-16 bg-surface-low border-t border-outline-soft/40">
+<section id="contact-form" class="py-16 bg-surface-low border-t border-outline-soft/40">
   <div class="mx-auto max-w-3xl px-4 md:px-8">
     <h2 class="font-display font-bold text-3xl text-forest-deep mb-2">Send Us a Note</h2>
     <p class="text-ink-soft mb-8">We usually reply within one business day.</p>
@@ -888,7 +1005,7 @@ contact_body = f"""
 """
 page("contact.html", "Visit Our Cannabis Dispensary in Hibbing, MN | Contact",
      "Visit Hibbing Dispensary at 302 E Howard Street in downtown Hibbing, MN. Hours, directions, phone, email, and lab certificate requests. Open 7 days, 21+.",
-     "contact", contact_body, "images/THC-Cannabis-Store-02.jpg")
+     "contact", contact_body, "images/THC-Cannabis-Store-02.jpg", page_type="ContactPage")
 
 # ============================================================ LEGAL PAGES
 def legal_page(filename, title, intro, sections):
@@ -1010,10 +1127,54 @@ page("sitemap.html", "Sitemap — Hibbing Dispensary", "A complete map of all pa
 
 xml = '<?xml version="1.0" encoding="UTF-8"?>\n<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">\n'
 for h, _ in ALL_PAGES:
-    loc = SITE_URL + "/" + ("" if h == "index.html" else h)
-    xml += f"  <url><loc>{loc}</loc></url>\n"
+    xml += f"  <url><loc>{url_of(h)}</loc></url>\n"
 xml += "</urlset>\n"
 with open(os.path.join(OUT, "sitemap.xml"), "w") as f: f.write(xml)
 with open(os.path.join(OUT, "robots.txt"), "w") as f:
     f.write(f"User-agent: *\nAllow: /\nSitemap: {SITE_URL}/sitemap.xml\n")
 print("built: sitemap.xml, robots.txt")
+
+# ============================================================
+# v2 AUTOMATED INTEGRITY CHECK — fails the build on any
+# dangling @id, invalid JSON-LD, or multiple graphs per page
+# ============================================================
+import re as _re2, glob as _glob
+
+def _collect_ids(obj, defined, referenced):
+    if isinstance(obj, dict):
+        keys = set(obj.keys())
+        if "@id" in obj:
+            if keys - {"@id"}:
+                defined.add(obj["@id"])
+            else:
+                referenced.add(obj["@id"])
+        for v in obj.values():
+            _collect_ids(v, defined, referenced)
+    elif isinstance(obj, list):
+        for v in obj:
+            _collect_ids(v, defined, referenced)
+
+failures = []
+for f in sorted(_glob.glob(os.path.join(OUT, "*.html"))):
+    html = open(f).read()
+    scripts = _re2.findall(r'<script type="application/ld\+json">(.*?)</script>', html, _re2.S)
+    if len(scripts) != 1:
+        failures.append(f"{os.path.basename(f)}: expected exactly 1 JSON-LD @graph, found {len(scripts)}")
+        continue
+    try:
+        data = json.loads(scripts[0])
+    except Exception as e:
+        failures.append(f"{os.path.basename(f)}: JSON parse error: {e}")
+        continue
+    if "@graph" not in data:
+        failures.append(f"{os.path.basename(f)}: missing @graph wrapper")
+        continue
+    defined, referenced = set(), set()
+    _collect_ids(data["@graph"], defined, referenced)
+    dangling = referenced - defined
+    if dangling:
+        failures.append(f"{os.path.basename(f)}: dangling @id refs: {sorted(dangling)}")
+
+if failures:
+    raise SystemExit("SCHEMA INTEGRITY FAILED:\n" + "\n".join(failures))
+print(f"schema integrity: OK ({len(_glob.glob(os.path.join(OUT, '*.html')))} pages, 1 @graph each, no dangling @ids)")

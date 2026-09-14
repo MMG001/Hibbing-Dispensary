@@ -43,3 +43,35 @@ Image alt text / EXIF metadata lives in `images/metadata.json` and `embed_metada
 - Street address `123 E Howard St` (verify/replace with the real address)
 - Contact form `action="#"` — connect a form handler (Formspree, Web3Forms, or a Worker)
 - Privacy Policy / Terms are templates — have legal counsel review
+
+## Structured data (v2 entity graph)
+Every page carries **one** `<script type="application/ld+json">` containing a single `@graph`
+with `@id`-linked nodes: `WebSite` → `Store/LocalBusiness` (#business) → `WebPage` (+ subtype:
+AboutPage/ContactPage/CollectionPage) → `BreadcrumbList` → 6 `Service` nodes → `Article` on
+education pages. `build.py` runs an automated integrity check on every build and fails on any
+dangling `@id`, multi-script page, or invalid JSON.
+
+**Service area:** `areaServed` = one `GeoCircle` (10 mi = 16,093 m radius from 47.4272, -92.9377)
+plus `City` nodes for Hibbing, Chisholm, Buhl, and Keewatin and `AdministrativeArea` nodes for
+St. Louis County, Itasca County, and Minnesota — each with its verified Wikipedia `sameAs` machine ID.
+
+**Intentionally not marked up (do not add):**
+- *Kelly Lake and Leetonia* — annexed neighborhoods of the city of Hibbing, already covered by
+  the Hibbing city node (their Wikipedia pages confirm annexation).
+- *Reviews/AggregateRating* — no first-party reviews are collected/displayed on-site yet. Google
+  or Yelp reviews may be displayed later but must **not** be marked up.
+- *FAQPage* — no visible Q&A blocks exist on these pages.
+- *Wikidata Q-IDs, GBP CID, social handles* — not yet verified; add to `sameAs` in
+  `node_business()` (build.py) once the real profiles exist.
+
+**Form ↔ action wiring:** the business node's `AskAction` targets `/contact#contact-form` with
+required inputs name/email/message, matching the form's `required` attributes 1:1. If you change
+the form fields, update the `potentialAction` block in `node_business()` in the same commit.
+
+**Clean URLs:** internal links, canonicals, `WebPage.@id`s, and sitemap entries all use
+extensionless root-relative URLs (`/shop`, `/cannabis-101`). Cloudflare Pages serves these
+automatically for the underlying `.html` files. Preview locally with
+`npx wrangler pages dev .` (plain `python -m http.server` won't resolve extensionless paths).
+
+**Before GSC submission:** replace the placeholder phone in `node_business()` and set the final
+domain in `SITE_URL`, then re-run `python3 build.py`.
