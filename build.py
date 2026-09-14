@@ -60,7 +60,7 @@ ORG_SCHEMA = {
   "logo": SITE_URL + "/images/THC-Cannabis-Hero.jpg",
   "image": SITE_URL + "/images/THC-Cannabis-Store.jpg",
   "foundingDate": "2026",
-  "address": {"@type": "PostalAddress", "streetAddress": "123 E Howard St",
+  "address": {"@type": "PostalAddress", "streetAddress": "302 E Howard Street",
     "addressLocality": "Hibbing", "addressRegion": "MN", "postalCode": "55746", "addressCountry": "US"},
   "geo": {"@type": "GeoCoordinates", "latitude": 47.4272, "longitude": -92.9377},
   "areaServed": {"@type": "GeoCircle", "name": "Hibbing, MN and surrounding communities within 5 miles",
@@ -226,7 +226,7 @@ FOOTER = """
     <div>
       <h3 class="font-label font-bold uppercase tracking-widest text-gold-bright text-xs mb-4">Visit</h3>
       <address class="not-italic text-sm text-white/80 space-y-2">
-        <p class="flex items-start gap-2"><span class="material-symbols-outlined text-gold text-lg" aria-hidden="true">location_on</span>123 E Howard St, Hibbing, MN 55746</p>
+        <p class="flex items-start gap-2"><span class="material-symbols-outlined text-gold text-lg" aria-hidden="true">location_on</span>302 E Howard Street, Hibbing, MN 55746</p>
         <p class="flex items-start gap-2"><span class="material-symbols-outlined text-gold text-lg" aria-hidden="true">call</span><a href="tel:+12180000000" class="hover:text-gold-bright">(218) 000-0000</a></p>
         <p class="flex items-start gap-2"><span class="material-symbols-outlined text-gold text-lg" aria-hidden="true">schedule</span>Mon–Sat 10am–9pm · Sun 11am–6pm</p>
       </address>
@@ -809,7 +809,7 @@ about_body = f"""
     {img("THC-Cannabis-Store-03.jpg", "rounded-2xl shadow-pop object-cover w-full aspect-[4/3] order-last lg:order-first")}
     <div>
       <h2 class="font-display font-bold text-3xl md:text-4xl text-forest-deep mb-5">Come Say Hi</h2>
-      <p class="text-ink-soft leading-relaxed mb-8">Browse the jars, smell the strains, ask us anything. We're at 123 E Howard St in downtown Hibbing, open seven days a week.</p>
+      <p class="text-ink-soft leading-relaxed mb-8">Browse the jars, smell the strains, ask us anything. We're at 302 E Howard Street in downtown Hibbing, open seven days a week.</p>
       <div class="flex flex-wrap gap-4">
         <a href="contact.html" class="bg-forest text-white font-label font-bold uppercase tracking-wider text-sm px-8 py-4 rounded-lg hover:bg-forest-deep hover:shadow-pop transition-all">Visit &amp; Contact Info</a>
         <a href="shop.html" class="border-2 border-forest text-forest font-label font-bold uppercase tracking-wider text-sm px-8 py-4 rounded-lg hover:bg-forest hover:text-white transition-colors">Browse the Menu</a>
@@ -833,7 +833,7 @@ contact_body = f"""
     <div class="bg-white rounded-xl shadow-card border border-outline-soft/30 p-7">
       <span class="material-symbols-outlined text-gold text-3xl mb-3" aria-hidden="true">location_on</span>
       <h2 class="font-display font-bold text-xl text-forest-deep mb-2">Visit the Shop</h2>
-      <address class="not-italic text-sm text-ink-soft leading-relaxed">123 E Howard St<br/>Hibbing, MN 55746</address>
+      <address class="not-italic text-sm text-ink-soft leading-relaxed">302 E Howard Street<br/>Hibbing, MN 55746</address>
       <p class="text-xs text-ink-soft/80 mt-2">Downtown on Howard Street — a short walk from the Greyhound Bus Museum, serving Hibbing, Chisholm, Keewatin, and neighbors within 5 miles.</p>
       <p class="text-sm text-ink-soft mt-3">Mon–Sat 10am–9pm<br/>Sun 11am–6pm</p>
       <p class="text-xs text-ink-soft/70 mt-3">Valid 21+ ID required at the door.</p>
@@ -887,7 +887,7 @@ contact_body = f"""
 </main>
 """
 page("contact.html", "Visit Our Cannabis Dispensary in Hibbing, MN | Contact",
-     "Visit Hibbing Dispensary at 123 E Howard St in downtown Hibbing, MN. Hours, directions, phone, email, and lab certificate requests. Open 7 days, 21+.",
+     "Visit Hibbing Dispensary at 302 E Howard Street in downtown Hibbing, MN. Hours, directions, phone, email, and lab certificate requests. Open 7 days, 21+.",
      "contact", contact_body, "images/THC-Cannabis-Store-02.jpg")
 
 # ============================================================ LEGAL PAGES
@@ -931,7 +931,7 @@ legal_page("privacy-policy.html", "Privacy Policy",
       "You can unsubscribe from marketing emails at any time using the link in any message. To request access to or deletion of your personal information, contact us at hello@hibbingdispensary.com.",
     ]),
     ("Contact", [
-      "Questions about this policy? Email hello@hibbingdispensary.com or write to Hibbing Dispensary, 123 E Howard St, Hibbing, MN 55746.",
+      "Questions about this policy? Email hello@hibbingdispensary.com or write to Hibbing Dispensary, 302 E Howard Street, Hibbing, MN 55746.",
     ]),
   ])
 
