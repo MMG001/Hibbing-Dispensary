@@ -445,7 +445,7 @@ home_body = f"""
         <span class="leading-tight"><span class="block font-body font-semibold text-sm">Open every day</span>
         <span class="block font-label text-[11px] font-bold uppercase tracking-widest text-white/60">Hours</span></span>
       </div>
-      <a href="shop.html" class="inline-flex items-center gap-2 bg-[#43a819] border-2 border-white rounded-full px-5 py-2.5 shadow-modal hover:bg-[#4dbb1f] transition-colors">
+      <a href="shop.html" class="inline-flex items-center gap-2 bg-[#43a819] text-forest-deep border-2 border-white rounded-full px-5 py-2.5 shadow-modal hover:bg-[#4dbb1f] transition-colors">
         <span class="font-label text-[11px] font-bold uppercase tracking-widest">Pickup</span>
         <span class="font-body font-bold text-sm">Ready in ~15 min</span>
       </a>
