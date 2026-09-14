@@ -19,15 +19,26 @@ LINK_CLS = "text-forest font-semibold underline decoration-gold decoration-2 und
 def L(href, text):
     return f'<a href="{href}" class="{LINK_CLS}">{text}</a>'
 
+CARD_SIZES = "(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 33vw"
+
+def _webp(n):
+    return "/images/" + n[:-4] + ".webp"
+
 def img(name, cls="", loading="lazy"):
     w, h = DIMS.get(name, [None, None])
     dim = f' width="{w}" height="{h}"' if w else ""
-    var = name[:-4] + "-640.jpg"
-    if loading == "lazy" and var in DIMS:
-        resp = f' srcset="/images/{var} 640w, /images/{name} {w}w" sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 33vw"'
-    else:
-        resp = ' fetchpriority="high"' if loading == "eager" else ""
-    return f'<img src="images/{name}" alt="{ALT.get(name, name)}" title="{ALT.get(name, name)}" class="{cls}" loading="{loading}"{dim}{resp}/>'
+    base = name[:-4]
+    alt = ALT.get(name, name)
+    if loading == "lazy" and base + "-640.jpg" in DIMS:
+        webp_ss = f"{_webp(base + '-640.jpg')} 640w, {_webp(name)} {w}w"
+        jpg_ss = f"/images/{base}-640.jpg 640w, /images/{name} {w}w"
+        return (f'<picture><source type="image/webp" srcset="{webp_ss}" sizes="{CARD_SIZES}"/>'
+                f'<img src="images/{name}" srcset="{jpg_ss}" sizes="{CARD_SIZES}" alt="{alt}" title="{alt}" class="{cls}" loading="lazy"{dim}/></picture>')
+    if loading == "eager":
+        parts = ([f"{_webp(base + '-828.jpg')} 828w"] if base + "-828.jpg" in DIMS else []) + [f"{_webp(name)} {w}w"]
+        return (f'<picture><source type="image/webp" srcset="{", ".join(parts)}" sizes="100vw"/>'
+                f'<img src="images/{name}" alt="{alt}" title="{alt}" class="{cls}" loading="eager" fetchpriority="high"{dim} sizes="100vw"/></picture>')
+    return f'<img src="images/{name}" alt="{alt}" title="{alt}" class="{cls}" loading="{loading}"{dim}/>'
 
 
 # ============================================================
@@ -181,10 +192,18 @@ def build_graph(filename, title, desc, og_image, page_type, crumbs, svc_level, e
 
 ICONS = "air,arrow_forward,call,close,cookie,diversity_3,expand_more,group,home_work,local_mall,location_on,mail,menu,schedule,school,science,shopping_bag,spa,storefront,verified,water_drop"
 ICONS_URL = "https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@24,400,0,0&icon_names=" + ICONS + "&display=block"
+TEXT_FONTS_URL = "https://fonts.googleapis.com/css2?family=DM+Sans:ital,opsz,wght@0,9..40,400..700;1,9..40,400..700&family=Space+Grotesk:wght@400..700&family=Syne:wght@600..800&display=swap"
 
 def head(title, desc, canonical, og_image="images/THC-Cannabis-Hero.jpg", graph=None, preload_hero=True):
     canon = url_of(canonical)
-    preload = f'<link rel="preload" as="image" href="/{og_image}" fetchpriority="high"/>\n' if preload_hero else ""
+    if preload_hero:
+        base = og_image.replace("images/", "")[:-4]
+        w = DIMS.get(base + ".jpg", [1568])[0]
+        parts = ([f"/images/{base}-828.webp 828w"] if base + "-828.jpg" in DIMS else []) + [f"/images/{base}.webp {w}w"]
+        preload = (f'<link rel="preload" as="image" href="/{og_image}" '
+                   f'imagesrcset="{", ".join(parts)}" imagesizes="100vw" fetchpriority="high"/>\n')
+    else:
+        preload = ""
     jsonld = f'<script type="application/ld+json">{json.dumps(graph)}</script>\n' if graph else ""
     return f"""<!DOCTYPE html>
 <html lang="en">
@@ -209,8 +228,9 @@ def head(title, desc, canonical, og_image="images/THC-Cannabis-Hero.jpg", graph=
 {jsonld}
 {preload}<link rel="preconnect" href="https://fonts.googleapis.com"/>
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin/>
-<link href="https://fonts.googleapis.com/css2?family=DM+Sans:ital,opsz,wght@0,9..40,400..700;1,9..40,400..700&family=Space+Grotesk:wght@400..700&family=Syne:wght@600..800&display=swap" rel="stylesheet"/>
-<link href="{ICONS_URL}" rel="stylesheet"/>
+<link href="{TEXT_FONTS_URL}" rel="stylesheet" media="print" onload="this.media='all'"/>
+<link href="{ICONS_URL}" rel="stylesheet" media="print" onload="this.media='all'"/>
+<noscript><link href="{TEXT_FONTS_URL}" rel="stylesheet"/><link href="{ICONS_URL}" rel="stylesheet"/></noscript>
 <link href="/css/app.css?v={BUILD_V}" rel="stylesheet"/>
 <style>
   .material-symbols-outlined {{ font-variation-settings: 'FILL' 0, 'wght' 400; }}
@@ -403,7 +423,7 @@ def hero_banner(image, eyebrow, title, sub=""):
     subhtml = f'<p class="text-white/85 text-lg max-w-2xl">{sub}</p>' if sub else ""
     return f"""
 <section class="relative overflow-hidden bg-forest-deep">
-  <img src="images/{image}" alt="{ALT.get(image, image)}" title="{ALT.get(image, image)}" class="absolute inset-0 h-full w-full object-cover" loading="eager" fetchpriority="high" width="{DIMS.get(image,[1568,441])[0]}" height="{DIMS.get(image,[1568,441])[1]}"/>
+  {img(image, "absolute inset-0 h-full w-full object-cover", loading="eager")}
   <div class="absolute inset-0 hero-fade" aria-hidden="true"></div>
   <div class="relative mx-auto max-w-shell px-4 md:px-10 py-20 md:py-28">
     <span class="sticker inline-block bg-gold text-forest-deep font-label font-bold text-xs uppercase tracking-widest px-4 py-1.5 rounded-full mb-5">{eyebrow}</span>

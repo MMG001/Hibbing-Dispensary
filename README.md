@@ -77,9 +77,15 @@ automatically for the underlying `.html` files. Preview locally with
 domain in `SITE_URL`, then re-run `python3 build.py`.
 
 ## Performance (Lighthouse fixes, Sept 2026)
-- **Tailwind is compiled statically** to `css/app.css` (~25 KB) — the render-blocking 126 KB
-  CDN dev script is gone. After editing any HTML/classes, run `./build.sh` (or
-  `npx tailwindcss -i input.css -o css/app.css --minify`) to regenerate.
+- **Tailwind is compiled statically and inlined** into each page's `<head>` (~6 KB gzipped) —
+  zero render-blocking requests. Always run `./build.sh` after edits: it generates HTML, compiles
+  `css/app.css`, and inlines it (order matters; don't run the steps individually).
+- **Google Fonts load asynchronously** (`media="print"` swap with `<noscript>` fallback), so slow
+  font CDN responses can no longer block first paint — this fixed a 10.6 s element render delay
+  on throttled mobile.
+- **All images ship as WebP with JPEG fallback** via `<picture>` (~30% lighter). `gen_webp.py`
+  creates `.webp` twins and 828w hero variants — run it after adding any new image, before
+  `./build.sh`. LCP preloads use `imagesrcset` pointing at the WebP set.
 - **Material Symbols is subset** via `icon_names=` to only the icons used (was a 1.1 MB woff2).
   If you add a new icon, add its name to `ICONS` in `build.py` (alphabetical) and rebuild.
 - Body fonts trimmed to used weights (DM Sans 400–700, Space Grotesk 400–700, Syne 600–800).
