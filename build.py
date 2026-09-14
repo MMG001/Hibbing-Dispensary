@@ -11,6 +11,10 @@ SITE_URL = "https://hibbing-dispensary.pages.dev"  # update after custom domain
 with open(os.path.join(OUT, "images", "metadata.json")) as f:
     ALT = json.load(f)
 
+LINK_CLS = "text-forest font-semibold underline decoration-gold decoration-2 underline-offset-2 hover:text-forest-deep"
+def L(href, text):
+    return f'<a href="{href}" class="{LINK_CLS}">{text}</a>'
+
 def img(name, cls="", loading="lazy"):
     return f'<img src="images/{name}" alt="{ALT.get(name, name)}" title="{ALT.get(name, name)}" class="{cls}" loading="{loading}"/>'
 
@@ -43,7 +47,50 @@ TAILWIND_CONFIG = """
     };
 """
 
-def head(title, desc, canonical, og_image="images/THC-Cannabis-Hero.jpg"):
+# ---- Triple-semantic entity schema: ENTITY (Store) + SERVICES (OfferCatalog) + AUDIENCE/INTENT (audience, areaServed, keywords)
+ORG_SCHEMA = {
+  "@context": "https://schema.org",
+  "@type": ["Store", "LocalBusiness"],
+  "@id": SITE_URL + "/#organization",
+  "name": "Hibbing Dispensary",
+  "additionalType": "https://en.wikipedia.org/wiki/Cannabis_retail",
+  "description": "Hibbing Dispensary is a licensed adult-use cannabis dispensary in Hibbing, Minnesota, selling lab-tested cannabis flower, edibles, concentrates, vapes, pre-rolls, tinctures, and topicals to adults 21 and over.",
+  "slogan": "Legal cannabis for sale — order ahead, pick up in store.",
+  "url": SITE_URL + "/",
+  "logo": SITE_URL + "/images/THC-Cannabis-Hero.jpg",
+  "image": SITE_URL + "/images/THC-Cannabis-Store.jpg",
+  "foundingDate": "2026",
+  "address": {"@type": "PostalAddress", "streetAddress": "123 E Howard St",
+    "addressLocality": "Hibbing", "addressRegion": "MN", "postalCode": "55746", "addressCountry": "US"},
+  "geo": {"@type": "GeoCoordinates", "latitude": 47.4272, "longitude": -92.9377},
+  "areaServed": {"@type": "GeoCircle", "name": "Hibbing, MN and surrounding communities within 5 miles",
+    "geoMidpoint": {"@type": "GeoCoordinates", "latitude": 47.4272, "longitude": -92.9377}, "geoRadius": "8047"},
+  "telephone": "+1-218-000-0000",
+  "email": "hello@hibbingdispensary.com",
+  "priceRange": "$$",
+  "paymentAccepted": "Cash, Debit",
+  "currenciesAccepted": "USD",
+  "openingHoursSpecification": [
+    {"@type": "OpeningHoursSpecification", "dayOfWeek": ["Monday","Tuesday","Wednesday","Thursday","Friday","Saturday"], "opens": "10:00", "closes": "21:00"},
+    {"@type": "OpeningHoursSpecification", "dayOfWeek": "Sunday", "opens": "11:00", "closes": "18:00"}],
+  "audience": {"@type": "PeopleAudience", "audienceType": "Adult cannabis consumers", "suggestedMinAge": 21,
+    "geographicArea": {"@type": "AdministrativeArea", "name": "Hibbing, Minnesota"}},
+  "keywords": "cannabis dispensary, Hibbing MN, legal cannabis for sale, order ahead cannabis, THC, CBD, edibles, flower, concentrates",
+  "hasOfferCatalog": {"@type": "OfferCatalog", "name": "Cannabis Menu", "itemListElement": [
+    {"@type": "OfferCatalog", "name": "Cannabis Flower"},
+    {"@type": "OfferCatalog", "name": "Edibles & Gummies"},
+    {"@type": "OfferCatalog", "name": "Concentrates & Oils"},
+    {"@type": "OfferCatalog", "name": "Vaporizers & Cartridges"},
+    {"@type": "OfferCatalog", "name": "Pre-Rolls"},
+    {"@type": "OfferCatalog", "name": "Tinctures & Topicals"}]},
+  "knowsAbout": ["Cannabis", "THC", "CBD", "Cannabis strains", "Edibles", "Concentrates", "Tinctures", "Topicals", "Minnesota cannabis law"],
+  "sameAs": ["https://github.com/MMG001/Hibbing-Dispensary"]
+}
+
+def head(title, desc, canonical, og_image="images/THC-Cannabis-Hero.jpg", extra_schema=None):
+    canon = SITE_URL + "/" + ("" if canonical == "index.html" else canonical)
+    schemas = [ORG_SCHEMA] + (extra_schema or [])
+    jsonld = "".join(f'<script type="application/ld+json">{json.dumps(s)}</script>\n' for s in schemas)
     return f"""<!DOCTYPE html>
 <html lang="en">
 <head>
@@ -51,13 +98,20 @@ def head(title, desc, canonical, og_image="images/THC-Cannabis-Hero.jpg"):
 <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
 <title>{title}</title>
 <meta name="description" content="{desc}"/>
-<link rel="canonical" href="{SITE_URL}/{canonical}"/>
+<link rel="canonical" href="{canon}"/>
 <meta property="og:title" content="{title}"/>
 <meta property="og:description" content="{desc}"/>
 <meta property="og:type" content="website"/>
-<meta property="og:url" content="{SITE_URL}/{canonical}"/>
+<meta property="og:url" content="{canon}"/>
 <meta property="og:image" content="{SITE_URL}/{og_image}"/>
+<meta property="og:image:alt" content="{ALT.get(og_image.replace('images/',''), title)}"/>
+<meta property="og:locale" content="en_US"/>
+<meta property="og:site_name" content="Hibbing Dispensary"/>
 <meta name="twitter:card" content="summary_large_image"/>
+<meta name="twitter:title" content="{title}"/>
+<meta name="twitter:description" content="{desc}"/>
+<meta name="twitter:image" content="{SITE_URL}/{og_image}"/>
+{jsonld}
 <link rel="preconnect" href="https://fonts.googleapis.com"/>
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin/>
 <link href="https://fonts.googleapis.com/css2?family=DM+Sans:ital,opsz,wght@0,9..40,100..1000;1,9..40,100..1000&family=Space+Grotesk:wght@300..700&family=Syne:wght@400..800&display=swap" rel="stylesheet"/>
@@ -186,7 +240,7 @@ FOOTER = """
   <!-- Lower footer -->
   <div class="bg-forest-night border-t border-forest">
     <div class="mx-auto max-w-shell px-4 md:px-10 py-5 flex flex-col md:flex-row items-center justify-between gap-3">
-      <p class="text-xs text-white/60">© 2026 Hibbing Dispensary. All rights reserved.</p>
+      <p class="text-xs text-white/60">© 2026 Hibbing Dispensary. All rights reserved. · Designed by <a href="https://webcreativeseo.com" rel="noopener" target="_blank" class="hover:text-gold-bright underline decoration-white/30 underline-offset-2">webcreativeseo.com</a></p>
       <nav class="flex flex-wrap items-center justify-center gap-x-3 gap-y-1 text-xs text-white/70" aria-label="Legal">
         <a href="privacy-policy.html" class="hover:text-gold-bright transition-colors">Privacy Policy</a><span aria-hidden="true">|</span>
         <a href="terms.html" class="hover:text-gold-bright transition-colors">Terms &amp; Conditions</a><span aria-hidden="true">|</span>
@@ -215,8 +269,8 @@ FOOTER = """
 </html>
 """
 
-def page(filename, title, desc, active, body, og_image="images/THC-Cannabis-Hero.jpg"):
-    html = head(title, desc, filename, og_image) + header_nav(active) + body + FOOTER
+def page(filename, title, desc, active, body, og_image="images/THC-Cannabis-Hero.jpg", extra_schema=None):
+    html = head(title, desc, filename, og_image, extra_schema) + header_nav(active) + body + FOOTER
     with open(os.path.join(OUT, filename), "w") as f:
         f.write(html)
     print("built:", filename)
@@ -245,13 +299,48 @@ home_body = f"""
   <div class="absolute inset-0 hero-fade" aria-hidden="true"></div>
   <div class="relative mx-auto max-w-shell px-4 md:px-10 py-24 md:py-36">
     <span class="sticker inline-block bg-gold text-forest-deep font-label font-bold text-xs uppercase tracking-widest px-4 py-1.5 rounded-full mb-6">Hibbing · Minnesota · 21+</span>
-    <h1 class="font-display font-extrabold text-white text-4xl md:text-6xl leading-tight mb-5 max-w-3xl">The Iron Range's Home for Craft Cannabis</h1>
-    <p class="text-white/85 text-lg md:text-xl max-w-2xl mb-8 leading-relaxed">Find your perfect strain from a curated variety of flower, edibles, concentrates, tinctures, and topicals — with budtenders who take the time to help you dose with confidence.</p>
+    <h1 class="font-display font-extrabold text-white text-4xl md:text-6xl leading-tight mb-5 max-w-3xl">Hibbing's Craft Cannabis Dispensary</h1>
+    <p class="text-white/85 text-lg md:text-xl max-w-2xl mb-8 leading-relaxed">Legal cannabis for sale to adults 21+ — order ahead online and pick up in store. A curated variety of flower, edibles, concentrates, tinctures, and topicals, with budtenders who take the time to help you dose with confidence. Proudly serving Hibbing and Iron Range neighbors within a five-mile radius.</p>
     <div class="flex flex-wrap gap-4">
       <a href="shop.html" class="inline-flex items-center gap-2 bg-gold text-forest-deep font-label font-bold uppercase tracking-wider text-sm px-8 py-4 rounded-lg hover:bg-gold-bright hover:shadow-pop transition-all">
         <span class="material-symbols-outlined" aria-hidden="true">storefront</span>Shop the Menu</a>
       <a href="education.html" class="inline-flex items-center gap-2 border-2 border-white/60 text-white font-label font-bold uppercase tracking-wider text-sm px-8 py-4 rounded-lg hover:bg-white/10 transition-colors">
         <span class="material-symbols-outlined" aria-hidden="true">school</span>New? Start Here</a>
+    </div>
+  </div>
+</section>
+
+<!-- TRUST BAR -->
+<section aria-label="Store highlights" class="bg-surface">
+  <svg viewBox="0 0 1440 48" class="block w-full text-forest-night" preserveAspectRatio="none" aria-hidden="true" style="margin-bottom:-1px">
+    <path fill="currentColor" d="M0,32 C180,8 340,4 520,18 C700,32 860,44 1040,34 C1220,24 1330,10 1440,22 L1440,48 L0,48 Z"/>
+  </svg>
+  <div class="bg-forest-night text-white">
+    <div class="mx-auto max-w-shell px-4 md:px-10 py-8 flex flex-wrap items-center justify-center lg:justify-between gap-x-10 gap-y-6">
+      <div class="flex items-baseline gap-3">
+        <span class="font-display font-extrabold text-2xl md:text-3xl">21+</span>
+        <span class="leading-tight"><span class="block font-body font-semibold text-sm">Valid ID required</span>
+        <span class="block font-label text-[11px] font-bold uppercase tracking-widest text-white/60">Adult Use</span></span>
+      </div>
+      <div class="flex items-baseline gap-3">
+        <span class="font-display font-extrabold text-2xl md:text-3xl">Cash</span>
+        <span class="leading-tight"><span class="block font-body font-semibold text-sm">&amp; Debit</span>
+        <span class="block font-label text-[11px] font-bold uppercase tracking-widest text-white/60">ATM On-Site</span></span>
+      </div>
+      <div class="flex items-baseline gap-3">
+        <span class="font-display font-extrabold text-2xl md:text-3xl">OCM</span>
+        <span class="leading-tight"><span class="block font-body font-semibold text-sm">Licensed</span>
+        <span class="block font-label text-[11px] font-bold uppercase tracking-widest text-white/60">Minnesota</span></span>
+      </div>
+      <div class="flex items-baseline gap-3">
+        <span class="font-display font-extrabold text-2xl md:text-3xl">7 days</span>
+        <span class="leading-tight"><span class="block font-body font-semibold text-sm">Open every day</span>
+        <span class="block font-label text-[11px] font-bold uppercase tracking-widest text-white/60">Hours</span></span>
+      </div>
+      <a href="shop.html" class="inline-flex items-center gap-2 bg-[#43a819] border-2 border-white rounded-full px-5 py-2.5 shadow-modal hover:bg-[#4dbb1f] transition-colors">
+        <span class="font-label text-[11px] font-bold uppercase tracking-widest">Pickup</span>
+        <span class="font-body font-bold text-sm">Ready in ~15 min</span>
+      </a>
     </div>
   </div>
 </section>
@@ -291,7 +380,7 @@ home_body = f"""
 <section class="py-16 bg-forest text-white">
   <div class="mx-auto max-w-shell px-4 md:px-10">
     <h2 class="font-display font-bold text-3xl mb-2">Know Your Onset</h2>
-    <p class="text-white/75 mb-10 max-w-2xl">How you consume changes when the effects arrive — and how long they last. Ask a budtender to help you find your dose.</p>
+    <p class="text-white/75 mb-10 max-w-2xl">How you consume changes when the effects arrive — and how long they last. Read the full breakdown in <a href="cannabis-101.html" class="text-gold-bright font-semibold underline decoration-gold decoration-2 underline-offset-2 hover:text-white">Cannabis 101</a>, or <a href="contact.html" class="text-gold-bright font-semibold underline decoration-gold decoration-2 underline-offset-2 hover:text-white">ask a budtender</a> to help you find your dose.</p>
     <div class="grid gap-6 md:grid-cols-3">
       <div class="bg-forest-deep/60 rounded-xl p-6 border border-gold/20">
         <span class="material-symbols-outlined text-gold text-3xl mb-3" aria-hidden="true">air</span>
@@ -376,8 +465,8 @@ home_body = f"""
 </section>
 </main>
 """
-page("index.html", "Hibbing Dispensary — Craft Cannabis in Hibbing, MN",
-     "Hibbing Dispensary is the Iron Range's home for craft cannabis: flower, edibles, concentrates, vapes, tinctures, and topicals. Adults 21+ in Hibbing, Minnesota.",
+page("index.html", "Cannabis Dispensary in Hibbing, MN | Hibbing Dispensary",
+     "Licensed cannabis dispensary in Hibbing, MN. Legal cannabis for sale — order ahead online for 15-minute pickup. Flower, edibles, concentrates & more. 21+.",
      "home", home_body)
 
 # ============================================================ SHOP
@@ -408,7 +497,7 @@ shop_body = f"""
     <div id="dutchie-menu-placeholder" class="bg-white rounded-2xl border-2 border-dashed border-forest/30 shadow-card p-10 md:p-16 text-center">
       <span class="material-symbols-outlined text-gold text-6xl mb-4" aria-hidden="true">storefront</span>
       <h2 class="font-display font-bold text-2xl md:text-3xl text-forest-deep mb-3">Online Menu Coming Soon</h2>
-      <p class="text-ink-soft max-w-xl mx-auto mb-8">Our live Dutchie ordering menu will appear right here. In the meantime, visit us in store or contact us to ask about today's selection of strains, edibles, and concentrates.</p>
+      <p class="text-ink-soft max-w-xl mx-auto mb-8">Our live Dutchie ordering menu will appear right here, so you can order ahead and pick up in about 15 minutes. In the meantime, visit us in store or <a href='contact.html' class='text-forest font-semibold underline decoration-gold decoration-2 underline-offset-2 hover:text-forest-deep'>contact us</a> to ask about today's selection of <a href='cannabis-strains.html' class='text-forest font-semibold underline decoration-gold decoration-2 underline-offset-2 hover:text-forest-deep'>strains</a>, edibles, and concentrates.</p>
       <div class="flex flex-wrap justify-center gap-4">
         <a href="contact.html" class="bg-forest text-white font-label font-bold uppercase tracking-wider text-sm px-8 py-3.5 rounded-lg hover:bg-forest-deep transition-colors">Contact Us</a>
         <a href="education.html" class="border-2 border-forest text-forest font-label font-bold uppercase tracking-wider text-sm px-8 py-3.5 rounded-lg hover:bg-forest hover:text-white transition-colors">Learn While You Wait</a>
@@ -442,8 +531,8 @@ shop_body = f"""
 </section>
 </main>
 """
-page("shop.html", "Shop the Menu — Hibbing Dispensary",
-     "Browse Hibbing Dispensary's live menu of cannabis flower, edibles, gummies, concentrates, vapes, pre-rolls, tinctures, and topicals. Order online for in-store pickup in Hibbing, MN.",
+page("shop.html", "Order Cannabis Online in Hibbing, MN | Hibbing Dispensary",
+     "Shop our cannabis dispensary menu: flower, edibles, gummies, concentrates, vapes, pre-rolls, tinctures & topicals. Order ahead for in-store pickup in Hibbing, MN.",
      "shop", shop_body, "images/THC-Cannabis-Store.jpg")
 
 # ============================================================ EDUCATION HUB
@@ -475,7 +564,7 @@ edu_body = f"""
 </section>
 </main>
 """
-page("education.html", "Cannabis Education Hub — Hibbing Dispensary",
+page("education.html", "Cannabis Education | Hibbing Dispensary, Hibbing MN",
      "Free cannabis education from Hibbing Dispensary: Cannabis 101, beginner guides, strains, CBD vs THC, benefits of cannabis, and Minnesota cannabis laws.",
      "education", edu_body, "images/THC-Cannabis-101-Hero.jpg")
 
@@ -485,12 +574,46 @@ def article(filename, hero_im, eyebrow, title, sub, sections, next_href, next_la
     for heading, paras in sections:
         ps = "".join(f'<p class="text-ink-soft leading-relaxed mb-5">{p}</p>' for p in paras)
         body_sections += f'<h2 class="font-display font-bold text-2xl md:text-3xl text-forest-deep mt-12 mb-4">{heading}</h2>{ps}'
+    related = [(h, l) for h, l in EDU_LINKS if h != filename][:3]
+    related_html = "".join(f"""
+      <a href="{h}" class="group bg-white rounded-xl p-5 shadow-card border border-outline-soft/30 hover:shadow-pop hover:-translate-y-0.5 transition-all">
+        <h3 class="font-display font-bold text-forest-deep group-hover:text-forest">{l}</h3>
+        <span class="mt-2 inline-flex items-center gap-1 font-label font-semibold uppercase tracking-wider text-xs text-forest">Read guide<span class="material-symbols-outlined text-sm" aria-hidden="true">arrow_forward</span></span>
+      </a>""" for h, l in related)
+    breadcrumb = {"@context": "https://schema.org", "@type": "BreadcrumbList", "itemListElement": [
+        {"@type": "ListItem", "position": 1, "name": "Home", "item": SITE_URL + "/"},
+        {"@type": "ListItem", "position": 2, "name": "Education", "item": SITE_URL + "/education.html"},
+        {"@type": "ListItem", "position": 3, "name": title, "item": SITE_URL + "/" + filename}]}
+    art_schema = {"@context": "https://schema.org", "@type": "Article", "headline": title, "description": sub,
+        "image": SITE_URL + "/images/" + hero_im, "datePublished": "2026-09-14", "dateModified": "2026-09-14",
+        "author": {"@type": "Organization", "name": "Hibbing Dispensary", "@id": SITE_URL + "/#organization"},
+        "publisher": {"@id": SITE_URL + "/#organization"},
+        "mainEntityOfPage": SITE_URL + "/" + filename,
+        "audience": {"@type": "PeopleAudience", "audienceType": "Adult cannabis consumers", "suggestedMinAge": 21}}
     body = f"""
 <main id="main">
 {hero_banner(hero_im, eyebrow, title, sub)}
 <section class="py-16 bg-surface">
   <div class="mx-auto max-w-3xl px-4 md:px-8">
+    <nav aria-label="Breadcrumb" class="mb-8">
+      <ol class="flex flex-wrap items-center gap-2 font-label text-xs font-semibold uppercase tracking-wider text-ink-soft">
+        <li><a href="index.html" class="hover:text-forest">Home</a></li>
+        <li aria-hidden="true" class="text-gold">/</li>
+        <li><a href="education.html" class="hover:text-forest">Education</a></li>
+        <li aria-hidden="true" class="text-gold">/</li>
+        <li aria-current="page" class="text-forest">{title.split(":")[0]}</li>
+      </ol>
+    </nav>
+    <p class="mb-10 flex flex-wrap items-center gap-x-3 gap-y-1 text-xs text-ink-soft/80 border-l-4 border-gold pl-4 py-1">
+      <span class="font-semibold text-forest">Written &amp; reviewed by the Hibbing Dispensary budtender team</span>
+      <span aria-hidden="true">·</span><span>Updated September 2026</span>
+      <span aria-hidden="true">·</span><span>Educational content — not medical or legal advice</span>
+    </p>
     <article>{body_sections}</article>
+    <div class="mt-14">
+      <h2 class="font-display font-bold text-2xl text-forest-deep mb-5">Keep Learning</h2>
+      <div class="grid gap-4 sm:grid-cols-3">{related_html}</div>
+    </div>
     <div class="mt-14 bg-forest rounded-2xl p-8 text-white flex flex-col sm:flex-row items-center justify-between gap-6">
       <div>
         <h2 class="font-display font-bold text-xl mb-1">Questions? Ask a budtender.</h2>
@@ -505,7 +628,7 @@ def article(filename, hero_im, eyebrow, title, sub, sections, next_href, next_la
 </section>
 </main>
 """
-    page(filename, f"{title} — Hibbing Dispensary", sub, "education", body, f"images/{hero_im}")
+    page(filename, f"{title} — Hibbing Dispensary", sub, "education", body, f"images/{hero_im}", [breadcrumb, art_schema])
 
 # ============================================================ CANNABIS 101
 article("cannabis-101.html", "THC-Cannabis-101-Hero.jpg", "Education · Cannabis 101",
@@ -514,19 +637,19 @@ article("cannabis-101.html", "THC-Cannabis-101-Hero.jpg", "Education · Cannabis
   [
     ("Meet the plant", [
       "Cannabis is a flowering plant whose resinous buds contain more than a hundred active compounds called cannabinoids. The two most famous are THC — the compound responsible for cannabis's psychoactive effects — and CBD, which does not produce a high. Alongside cannabinoids, aromatic compounds called terpenes give each strain its distinct smell, flavor, and character.",
-      "When you visit a dispensary, everything on the shelf — flower, edibles, concentrates, oils, tinctures, and topicals — starts with this same plant. Producers extract, infuse, and craft it into different forms, each with its own onset time, duration, and intensity.",
+      "When you visit <a href='about.html' class='text-forest font-semibold underline decoration-gold decoration-2 underline-offset-2 hover:text-forest-deep'>a dispensary</a>, everything on <a href='shop.html' class='text-forest font-semibold underline decoration-gold decoration-2 underline-offset-2 hover:text-forest-deep'>the shelf</a> — flower, edibles, concentrates, oils, tinctures, and topicals — starts with this same plant. Producers extract, infuse, and craft it into different forms, each with its own onset time, duration, and intensity.",
     ]),
     ("THC, CBD, and the endocannabinoid system", [
-      "Your body has a built-in network called the endocannabinoid system that helps regulate mood, appetite, sleep, and pain perception. THC binds directly to receptors in this system, which is why it produces noticeable psychoactive effects — euphoria, relaxation, altered perception, and appetite stimulation.",
+      "Your body has a built-in network called the endocannabinoid system that helps regulate mood, appetite, sleep, and pain perception. THC binds directly to receptors in this system, which is why it produces noticeable psychoactive effects — euphoria, relaxation, altered perception, and appetite stimulation. (For a deeper side-by-side, see our <a href='cbd-vs-thc.html' class='text-forest font-semibold underline decoration-gold decoration-2 underline-offset-2 hover:text-forest-deep'>CBD vs THC guide</a>.)",
       "CBD interacts with the same system differently, offering many of the plant's benefits without intoxication. Many products blend the two; the THC:CBD ratio on a label is one of the most useful numbers you can learn to read.",
     ]),
     ("Why consumption method matters", [
       "Inhalation — smoking flower or vaping — delivers cannabinoids through the lungs. Onset arrives within minutes, and effects typically last one to three hours. Because feedback is fast, inhalation makes it easy to dose gradually.",
-      "Edibles like gummies take a very different route: your digestive system. Onset can take anywhere from 30 minutes to two hours, and effects can last several hours — often longer and stronger than inhalation. This is why every budtender will tell you to start low and wait before taking more.",
+      "Edibles like gummies take a very different route: your digestive system. Onset can take anywhere from 30 minutes to two hours, and effects can last several hours — often longer and stronger than inhalation. This is why every budtender will tell you to start low and wait before taking more — a rule we unpack in <a href='cannabis-for-beginners.html' class='text-forest font-semibold underline decoration-gold decoration-2 underline-offset-2 hover:text-forest-deep'>Cannabis for Beginners</a>.",
       "Cannabis tinctures are infused oils you drop under the tongue, where cannabinoids absorb through the tissue for a middle-ground onset of about 15 to 45 minutes. Topicals — balms, lotions, and salves you apply directly to the skin — deliver localized benefits and generally do not produce psychoactive effects at all.",
     ]),
     ("Reading a product label", [
-      "Every licensed product in Minnesota is lab-tested and labeled with its THC and CBD content. For flower, potency appears as a percentage; for edibles and tinctures, it appears in milligrams per serving. A standard beginner edible dose is 2–5 mg of THC. Ask our team to walk you through any label — that's what we're here for.",
+      "Every licensed product in Minnesota is lab-tested and labeled with its THC and CBD content. For flower, potency appears as a percentage; for edibles and tinctures, it appears in milligrams per serving. A standard beginner edible dose is 2–5 mg of THC. <a href='contact.html' class='text-forest font-semibold underline decoration-gold decoration-2 underline-offset-2 hover:text-forest-deep'>Ask our team</a> to walk you through any label — that's what we're here for. Ready to browse? The full menu variety lives on our <a href='shop.html' class='text-forest font-semibold underline decoration-gold decoration-2 underline-offset-2 hover:text-forest-deep'>shop page</a>, and our <a href='cannabis-strains.html' class='text-forest font-semibold underline decoration-gold decoration-2 underline-offset-2 hover:text-forest-deep'>strain guide</a> will help you narrow it down.",
     ]),
   ], "cannabis-for-beginners.html", "Cannabis for Beginners")
 
@@ -536,20 +659,20 @@ article("cannabis-for-beginners.html", "THC-Cannabis-For-Beginers-Hero.jpg", "Ed
   "New to cannabis or coming back after a long break? Here's exactly what to expect, what to ask, and how to have a great first experience.",
   [
     ("Before you arrive", [
-      "Bring a valid government-issued ID showing you're 21 or older — you'll need it at the door, no exceptions. Think about what you want from the experience: relaxation, better sleep, social energy, creativity, or relief without a high. The clearer your goal, the better we can guide you.",
+      "Bring a valid government-issued ID showing you're 21 or older — you'll need it at the door, no exceptions. Think about what you want from the experience: relaxation, better sleep, social energy, creativity, or relief without a high. The clearer your goal, the better we can guide you. (Not sure how the plant works yet? Skim <a href='cannabis-101.html' class='text-forest font-semibold underline decoration-gold decoration-2 underline-offset-2 hover:text-forest-deep'>Cannabis 101</a> first — five minutes well spent.)",
     ]),
     ("What to ask your budtender", [
-      "There are no silly questions at a dispensary. Good ones to start with: What do you recommend for a first-timer? How strong is this, and how much should I take? How long until I feel it, and how long will it last? What's the difference between these two strains? Our budtenders will never rush you — take your time and ask everything.",
+      "There are no silly questions at a dispensary. Good ones to start with: What do you recommend for a first-timer? How strong is this, and how much should I take? How long until I feel it, and how long will it last? What's the difference between <a href='cannabis-strains.html' class='text-forest font-semibold underline decoration-gold decoration-2 underline-offset-2 hover:text-forest-deep'>these two strains</a>? Our budtenders will never rush you — take your time and ask everything.",
     ]),
     ("Start low, go slow", [
       "The golden rule of cannabis. If you choose an edible, start with 2–5 mg of THC and wait at least two full hours before considering more — onset is slow, and effects can last several hours. If you choose flower or a vape, take one small inhalation and wait 10–15 minutes to feel the effects before continuing.",
       "It's much easier to take a little more than to undo taking too much. If you ever feel uncomfortably high: you are safe, it will pass. Find a calm place, drink water, eat a snack, and rest — the feeling fades with time.",
     ]),
     ("Beginner-friendly picks", [
-      "Low-dose gummies give you precise, repeatable dosing with no smoke. Balanced THC:CBD tinctures let you experiment a few drops at a time. Pre-rolls with moderate THC are an easy, no-equipment way to try flower. And if you want zero psychoactive effects, CBD-dominant products and topicals let you explore the plant's benefits while staying completely clear-headed.",
+      "Low-dose gummies give you precise, repeatable dosing with no smoke. Balanced THC:CBD tinctures let you experiment a few drops at a time. Pre-rolls with moderate THC are an easy, no-equipment way to try flower. And if you want zero psychoactive effects, <a href='cbd-vs-thc.html' class='text-forest font-semibold underline decoration-gold decoration-2 underline-offset-2 hover:text-forest-deep'>CBD-dominant products</a> and topicals let you explore <a href='benefits-of-cannabis.html' class='text-forest font-semibold underline decoration-gold decoration-2 underline-offset-2 hover:text-forest-deep'>the plant's benefits</a> while staying completely clear-headed. When you're ready, you can <a href='shop.html' class='text-forest font-semibold underline decoration-gold decoration-2 underline-offset-2 hover:text-forest-deep'>order ahead online</a> and your pickup will be waiting.",
     ]),
     ("Plan the practical stuff", [
-      "Never drive after consuming — arrange a ride or consume at home. Store products in their original child-resistant packaging, away from kids and pets. And under Minnesota law, consume on private property, not in public spaces or vehicles.",
+      "Never drive after consuming — arrange a ride or consume at home. Store products in their original child-resistant packaging, away from kids and pets. And under <a href='cannabis-laws.html' class='text-forest font-semibold underline decoration-gold decoration-2 underline-offset-2 hover:text-forest-deep'>Minnesota law</a>, consume on private property, not in public spaces or vehicles.",
     ]),
   ], "cannabis-strains.html", "Cannabis Strains")
 
@@ -567,10 +690,10 @@ article("cannabis-strains.html", "THC-Cannabis-Strains-Hero.jpg", "Education · 
       "Smell is data: when a strain's aroma appeals to you, that's often a good sign. Ask to see and smell our jars — finding your terpene preferences is one of the most enjoyable parts of exploring cannabis.",
     ]),
     ("Potency isn't everything", [
-      "It's tempting to shop by THC percentage alone, but a 20% THC strain with the right terpene profile can deliver a far better experience than a 30% strain that doesn't suit you. Consider the full picture: THC, CBD, terpenes, and how a strain is grown and cured.",
+      "It's tempting to shop by THC percentage alone, but a 20% THC strain with the right terpene profile can deliver a far better experience than a 30% strain that doesn't suit you. Consider the full picture: <a href='cannabis-101.html' class='text-forest font-semibold underline decoration-gold decoration-2 underline-offset-2 hover:text-forest-deep'>THC, CBD</a>, terpenes, and how a strain is grown and cured. If intoxication level is your main question, our <a href='cbd-vs-thc.html' class='text-forest font-semibold underline decoration-gold decoration-2 underline-offset-2 hover:text-forest-deep'>CBD vs THC guide</a> covers ratios in depth.",
     ]),
     ("How to explore the variety", [
-      "Keep a simple strain journal: note the name, how much you consumed, and how it made you feel. After a few entries, patterns emerge — and our budtenders can use your notes to recommend strains you'll love. New drops arrive regularly, so check the menu often.",
+      "Keep a simple strain journal: note the name, how much you consumed, and how it made you feel. After a few entries, patterns emerge — and our budtenders can use your notes to recommend strains you'll love. New drops arrive regularly, so <a href='shop.html' class='text-forest font-semibold underline decoration-gold decoration-2 underline-offset-2 hover:text-forest-deep'>check the menu</a> often — and if you're brand new to all this, start with our <a href='cannabis-for-beginners.html' class='text-forest font-semibold underline decoration-gold decoration-2 underline-offset-2 hover:text-forest-deep'>beginner's guide</a>.",
     ]),
   ], "cbd-vs-thc.html", "CBD vs THC")
 
@@ -580,10 +703,10 @@ article("cbd-vs-thc.html", "CBD-vs-THC-Hero.jpg", "Education · Cannabinoids",
   "The two best-known cannabinoids explained side by side — how each feels, what each is used for, and how to choose the right ratio.",
   [
     ("The one-sentence answer", [
-      "THC produces the psychoactive effects — the 'high' — while CBD does not; both interact with your body's endocannabinoid system, but in very different ways.",
+      "THC produces the psychoactive effects — the 'high' — while CBD does not; both interact with your body's <a href='cannabis-101.html' class='text-forest font-semibold underline decoration-gold decoration-2 underline-offset-2 hover:text-forest-deep'>endocannabinoid system</a>, but in very different ways.",
     ]),
     ("THC: the psychoactive cannabinoid", [
-      "Tetrahydrocannabinol binds directly to CB1 receptors in the brain, producing euphoria, relaxation, altered sensory perception, and appetite stimulation. People reach for THC for recreation, deep relaxation, sleep support, and comfort. Effects depend heavily on dose and consumption method: inhalation hits in minutes and fades within a few hours, while edibles arrive slowly and last several hours.",
+      "Tetrahydrocannabinol binds directly to CB1 receptors in the brain, producing euphoria, relaxation, altered sensory perception, and appetite stimulation. People reach for THC for recreation, deep relaxation, sleep support, and comfort. Effects depend heavily on dose and consumption method: inhalation hits in minutes and fades within a few hours, while edibles arrive slowly and last several hours. Choosing between <a href='cannabis-strains.html' class='text-forest font-semibold underline decoration-gold decoration-2 underline-offset-2 hover:text-forest-deep'>strains</a> fine-tunes the experience further.",
     ]),
     ("CBD: benefits without the buzz", [
       "Cannabidiol doesn't produce intoxication. People use it for calm, everyday comfort, and recovery while staying fully clear-headed. CBD is available in the same variety of forms — oils, tinctures, gummies, and topicals — and can even soften the intensity of THC when the two are taken together.",
@@ -592,7 +715,7 @@ article("cbd-vs-thc.html", "CBD-vs-THC-Hero.jpg", "Education · Cannabinoids",
       "Products are often labeled with a THC:CBD ratio. THC-dominant (like 20:1) delivers the classic psychoactive experience. Balanced (1:1) offers gentler effects with added CBD smoothness — a favorite for newcomers. CBD-dominant (1:20) provides plant benefits with little to no high. If you're unsure, start balanced and adjust from there.",
     ]),
     ("Which is right for you?", [
-      "Want the full experience? THC-dominant flower, vapes, or edibles. Want to stay sharp while feeling better? CBD-dominant tinctures or gummies. Want targeted relief on a sore spot? A topical balm applied to the skin — no psychoactive effects at all. Our budtenders can help you dial in the exact ratio for your goals.",
+      "Want the full experience? THC-dominant flower, vapes, or edibles. Want to stay sharp while feeling better? CBD-dominant tinctures or gummies. Want targeted relief on a sore spot? A topical balm applied to the skin — no psychoactive effects at all. Our budtenders can help you <a href='contact.html' class='text-forest font-semibold underline decoration-gold decoration-2 underline-offset-2 hover:text-forest-deep'>dial in the exact ratio</a> for your goals — or browse both THC and CBD options on <a href='shop.html' class='text-forest font-semibold underline decoration-gold decoration-2 underline-offset-2 hover:text-forest-deep'>the menu</a> now.",
     ]),
   ], "benefits-of-cannabis.html", "Benefits of Cannabis")
 
@@ -605,7 +728,7 @@ article("benefits-of-cannabis.html", "Benefits-of-Cannabis-Hero.jpg", "Education
       "The most common reason adults consume cannabis is simple: unwinding. THC's psychoactive effects can melt the edge off a long day, while CBD offers a calmer, clear-headed version of the same relief. Many people find a small evening dose — a few drops of tincture or a low-dose gummy — becomes their favorite ritual.",
     ]),
     ("Sleep support", [
-      "Indica-leaning strains and edibles are popular nighttime companions. Because edibles last several hours, many consumers prefer them for staying asleep through the night. Terpenes like myrcene and linalool add to the sedating character of certain strains.",
+      "Indica-leaning strains and edibles are popular nighttime companions. Because <a href='cannabis-101.html' class='text-forest font-semibold underline decoration-gold decoration-2 underline-offset-2 hover:text-forest-deep'>edibles last several hours</a>, many consumers prefer them for staying asleep through the night. Terpenes like myrcene and linalool add to the sedating character of certain strains.",
     ]),
     ("Comfort and recovery", [
       "Cannabis has a long history of use for everyday aches and physical comfort. Topicals are a standout here: balms and salves infused with cannabinoids can be applied directly to the skin for localized relief without any psychoactive effects — you can use them any time of day and stay completely clear-headed.",
@@ -614,10 +737,10 @@ article("benefits-of-cannabis.html", "Benefits-of-Cannabis-Hero.jpg", "Education
       "THC famously stimulates appetite and heightens taste and sensory enjoyment — a genuine benefit for people who struggle to eat, and a pleasure for everyone else. Food, music, and nature all get a little more vivid.",
     ]),
     ("Social connection and creativity", [
-      "Shared pre-rolls and low-dose edibles have become a social alternative to alcohol for many adults — no hangover, easier moderation. Sativa-leaning strains are prized for sparking conversation, laughter, and creative flow.",
+      "Shared pre-rolls and low-dose edibles have become a social alternative to alcohol for many adults — no hangover, easier moderation. <a href='cannabis-strains.html' class='text-forest font-semibold underline decoration-gold decoration-2 underline-offset-2 hover:text-forest-deep'>Sativa-leaning strains</a> are prized for sparking conversation, laughter, and creative flow.",
     ]),
     ("A note on responsibility", [
-      "Benefits come with responsible use: know your dose, never drive under the influence, store products away from children and pets, and talk to your doctor if you take medications or have health conditions. Cannabis affects everyone differently — the best experience is an informed one. This page is for education only and isn't medical advice.",
+      "Benefits come with responsible use: <a href='cannabis-for-beginners.html' class='text-forest font-semibold underline decoration-gold decoration-2 underline-offset-2 hover:text-forest-deep'>know your dose</a>, never drive under the influence per <a href='cannabis-laws.html' class='text-forest font-semibold underline decoration-gold decoration-2 underline-offset-2 hover:text-forest-deep'>Minnesota law</a>, store products away from children and pets, and talk to your doctor if you take medications or have health conditions. Cannabis affects everyone differently — the best experience is an informed one. This page is for education only and isn't medical advice.",
     ]),
   ], "cannabis-laws.html", "Cannabis Laws")
 
@@ -627,7 +750,7 @@ article("cannabis-laws.html", "THC-Cannabis-Hero.jpg", "Education · Minnesota L
   "What Minnesota's adult-use cannabis law means for you — possession limits, where you can consume, and where to read the official statutes.",
   [
     ("Adult use is legal in Minnesota", [
-      "Minnesota legalized adult-use cannabis for people 21 and older. Licensed dispensaries like ours sell lab-tested flower, edibles, concentrates, tinctures, and topicals to adults with valid ID. The industry is regulated by the state's Office of Cannabis Management.",
+      "Minnesota legalized adult-use cannabis for people 21 and older. <a href='about.html' class='text-forest font-semibold underline decoration-gold decoration-2 underline-offset-2 hover:text-forest-deep'>Licensed dispensaries like ours</a> sell lab-tested <a href='shop.html' class='text-forest font-semibold underline decoration-gold decoration-2 underline-offset-2 hover:text-forest-deep'>flower, edibles, concentrates, tinctures, and topicals</a> to adults with valid ID. The industry is regulated by the state's Office of Cannabis Management.",
     ]),
     ("The basics every consumer should know", [
       "You must be 21+ with valid ID to purchase or possess cannabis. State law sets limits on how much you can possess in public and at home, and on the potency of edible servings. Consumption is allowed on private property (with the owner's permission) — not in public places, schools, or vehicles. Driving under the influence of cannabis remains illegal, full stop. And transporting cannabis across state lines is prohibited, even to states where it's legal.",
@@ -637,7 +760,7 @@ article("cannabis-laws.html", "THC-Cannabis-Hero.jpg", "Education · Minnesota L
       'Rules evolve as the program matures, so go straight to the source. The current statutes live at <a href="https://www.revisor.mn.gov/statutes/cite/342.09" class="text-forest font-semibold underline decoration-gold decoration-2 underline-offset-2 hover:text-forest-deep" rel="noopener" target="_blank">Minnesota Statutes, Chapter 342 (revisor.mn.gov)</a>, and the <a href="https://mn.gov/ocm/" class="text-forest font-semibold underline decoration-gold decoration-2 underline-offset-2 hover:text-forest-deep" rel="noopener" target="_blank">Minnesota Office of Cannabis Management</a> publishes consumer guidance, license information, and program updates.',
     ]),
     ("Our commitment to compliance", [
-      "Hibbing Dispensary operates in full compliance with Minnesota law: every product is lab-tested, properly labeled, and sold in child-resistant packaging, and every customer is ID-verified at 21+. If you ever have a question about what's legal, ask us — and when in doubt, check the statutes above. This page is a plain-language summary, not legal advice.",
+      "Hibbing Dispensary operates in full compliance with Minnesota law: every product is lab-tested, properly labeled, and sold in child-resistant packaging, and every customer is ID-verified at 21+. If you ever have a question about what's legal, <a href='contact.html' class='text-forest font-semibold underline decoration-gold decoration-2 underline-offset-2 hover:text-forest-deep'>ask us</a> — and when in doubt, check the statutes above. This page is a plain-language summary, not legal advice.",
     ]),
   ], "cannabis-101.html", "Cannabis 101")
 
@@ -651,8 +774,8 @@ about_body = f"""
     <div>
       <h2 class="font-display font-bold text-3xl md:text-4xl text-forest-deep mb-5">Why We Opened Our Doors</h2>
       <p class="text-ink-soft leading-relaxed mb-5">Hibbing built itself on hard work, community, and doing things right — and that's exactly how we built this dispensary. When Minnesota opened the door to legal adult-use cannabis, we saw a chance to bring the Range something it deserved: a local shop with lab-tested products, fair prices, and staff who actually take the time to help.</p>
-      <p class="text-ink-soft leading-relaxed mb-5">We stock a curated variety, not an overwhelming wall: craft flower from growers we trust, precisely dosed edibles and gummies, small-batch concentrates and oils, tinctures for the no-smoke crowd, and topicals and balms for targeted comfort.</p>
-      <p class="text-ink-soft leading-relaxed">Whether it's your first visit or your five-hundredth, you'll get the same welcome — no judgment, no rush, no pressure.</p>
+      <p class="text-ink-soft leading-relaxed mb-5">We stock <a href='shop.html' class='text-forest font-semibold underline decoration-gold decoration-2 underline-offset-2 hover:text-forest-deep'>a curated variety</a>, not an overwhelming wall: craft flower from growers we trust, precisely dosed edibles and gummies, small-batch concentrates and oils, tinctures for the no-smoke crowd, and topicals and balms for targeted comfort. New to all of it? Our <a href='education.html' class='text-forest font-semibold underline decoration-gold decoration-2 underline-offset-2 hover:text-forest-deep'>education hub</a> was written for you.</p>
+      <p class="text-ink-soft leading-relaxed">Whether it's your first visit or your five-hundredth, you'll get the same welcome — no judgment, no rush, no pressure. We operate fully within <a href='cannabis-laws.html' class='text-forest font-semibold underline decoration-gold decoration-2 underline-offset-2 hover:text-forest-deep'>Minnesota's adult-use cannabis law</a>, serving Hibbing and Iron Range neighbors within a five-mile radius — from downtown Howard Street to Chisholm and Keewatin.</p>
     </div>
     {img("THC-Cannabis-Store-02.jpg", "rounded-2xl shadow-pop object-cover w-full aspect-[4/3]")}
   </div>
@@ -696,8 +819,8 @@ about_body = f"""
 </section>
 </main>
 """
-page("about.html", "About Us — Hibbing Dispensary",
-     "Hibbing Dispensary is a locally owned cannabis dispensary in Hibbing, Minnesota — lab-tested products, education-first budtenders, and Iron Range roots.",
+page("about.html", "About Our Cannabis Dispensary | Hibbing, MN",
+     "Hibbing Dispensary is a locally owned, OCM-licensed cannabis dispensary in Hibbing, Minnesota — lab-tested products, education-first budtenders, Iron Range roots.",
      "about", about_body, "images/About-Us-page.jpg")
 
 # ============================================================ CONTACT
@@ -711,6 +834,7 @@ contact_body = f"""
       <span class="material-symbols-outlined text-gold text-3xl mb-3" aria-hidden="true">location_on</span>
       <h2 class="font-display font-bold text-xl text-forest-deep mb-2">Visit the Shop</h2>
       <address class="not-italic text-sm text-ink-soft leading-relaxed">123 E Howard St<br/>Hibbing, MN 55746</address>
+      <p class="text-xs text-ink-soft/80 mt-2">Downtown on Howard Street — a short walk from the Greyhound Bus Museum, serving Hibbing, Chisholm, Keewatin, and neighbors within 5 miles.</p>
       <p class="text-sm text-ink-soft mt-3">Mon–Sat 10am–9pm<br/>Sun 11am–6pm</p>
       <p class="text-xs text-ink-soft/70 mt-3">Valid 21+ ID required at the door.</p>
     </div>
@@ -762,8 +886,8 @@ contact_body = f"""
 </section>
 </main>
 """
-page("contact.html", "Contact &amp; Visit — Hibbing Dispensary",
-     "Visit Hibbing Dispensary at 123 E Howard St, Hibbing, MN. Call, email, or send us a message — hours, directions, and lab certificate requests.",
+page("contact.html", "Visit Our Cannabis Dispensary in Hibbing, MN | Contact",
+     "Visit Hibbing Dispensary at 123 E Howard St in downtown Hibbing, MN. Hours, directions, phone, email, and lab certificate requests. Open 7 days, 21+.",
      "contact", contact_body, "images/THC-Cannabis-Store-02.jpg")
 
 # ============================================================ LEGAL PAGES
