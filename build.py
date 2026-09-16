@@ -128,8 +128,6 @@ def node_business():
         "openingHoursSpecification": [
             {"@type": "OpeningHoursSpecification", "dayOfWeek": ["Monday","Tuesday","Wednesday","Thursday","Friday","Saturday"], "opens": "10:00", "closes": "21:00"},
             {"@type": "OpeningHoursSpecification", "dayOfWeek": "Sunday", "opens": "11:00", "closes": "18:00"}],
-        "audience": {"@type": "PeopleAudience", "audienceType": "Adult cannabis consumers", "suggestedMinAge": 21,
-            "geographicArea": {"@type": "AdministrativeArea", "name": "Hibbing, Minnesota", "sameAs": WIKI["Hibbing"]}},
         "brand": {"@type": "Brand", "name": "Hibbing Dispensary"},
         "amenityFeature": [
             {"@type": "LocationFeatureSpecification", "name": "ATM On-Site", "value": True},
@@ -160,10 +158,7 @@ def node_business():
                 "actionPlatform": ["http://schema.org/DesktopWebPlatform", "http://schema.org/MobileWebPlatform"]}},
             {"@type": "AskAction", "name": "Send an inquiry",
              "target": {"@type": "EntryPoint", "urlTemplate": SITE_URL + "/contact#contact-form", "inLanguage": "en-US",
-                "actionPlatform": ["http://schema.org/DesktopWebPlatform", "http://schema.org/MobileWebPlatform"]},
-             "name-input": {"@type": "PropertyValueSpecification", "valueName": "name", "valueRequired": True},
-             "email-input": {"@type": "PropertyValueSpecification", "valueName": "email", "valueRequired": True},
-             "message-input": {"@type": "PropertyValueSpecification", "valueName": "message", "valueRequired": True}},
+                "actionPlatform": ["http://schema.org/DesktopWebPlatform", "http://schema.org/MobileWebPlatform"]}},
             {"@type": "CommunicateAction", "name": "Call the dispensary",
              "target": {"@type": "EntryPoint", "urlTemplate": "tel:+12180000000",
                 "actionPlatform": ["http://schema.org/DesktopWebPlatform", "http://schema.org/MobileWebPlatform"]}},
