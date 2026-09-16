@@ -239,7 +239,7 @@ def head(title, desc, canonical, og_image="images/THC-Cannabis-Hero.jpg", graph=
   .sticker-r {{ transform: rotate(2deg); }}
   .dropdown:hover .dropdown-menu, .dropdown:focus-within .dropdown-menu {{ opacity: 1; visibility: visible; transform: translateY(0); }}
   .dropdown-menu {{ opacity: 0; visibility: hidden; transform: translateY(8px); transition: all .18s ease; }}
-  .hero-fade {{ background: linear-gradient(90deg, rgba(1,45,21,.82) 0%, rgba(1,45,21,.55) 45%, rgba(1,45,21,.15) 100%); }}
+  .hero-fade {{ background: linear-gradient(90deg, rgba(0,0,0,.82) 0%, rgba(0,0,0,.55) 45%, rgba(0,0,0,.15) 100%); }}
   @media (prefers-reduced-motion: reduce) {{ html {{ scroll-behavior: auto; }} * {{ transition: none !important; }} }}
 </style>
 </head>
