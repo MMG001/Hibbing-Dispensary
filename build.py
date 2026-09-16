@@ -60,17 +60,12 @@ WIKI = {
 }
 GEO = {"@type": "GeoCoordinates", "latitude": 47.4272, "longitude": -92.9377}
 GEO_CIRCLE = {"@type": "GeoCircle",
-    "description": "10-mile service radius anchored on Hibbing, Minnesota",
-    "geoMidpoint": GEO, "geoRadius": "16093"}
+    "description": "30-mile service radius anchored on Hibbing, Minnesota",
+    "geoMidpoint": GEO, "geoRadius": "48280"}
 AREA_SERVED = [
     GEO_CIRCLE,
+    {"@type": "State", "name": "Minnesota", "sameAs": WIKI["Minnesota"]},
     {"@type": "City", "name": "Hibbing", "sameAs": WIKI["Hibbing"]},
-    {"@type": "City", "name": "Chisholm", "sameAs": WIKI["Chisholm"]},
-    {"@type": "City", "name": "Buhl", "sameAs": WIKI["Buhl"]},
-    {"@type": "City", "name": "Keewatin", "sameAs": WIKI["Keewatin"]},
-    {"@type": "AdministrativeArea", "name": "St. Louis County, Minnesota", "sameAs": WIKI["StLouisCounty"]},
-    {"@type": "AdministrativeArea", "name": "Itasca County, Minnesota", "sameAs": WIKI["ItascaCounty"]},
-    {"@type": "AdministrativeArea", "name": "Minnesota", "sameAs": WIKI["Minnesota"]},
 ]
 
 # Per-slug service metadata: (id-slug, name, serviceType, blurb, wikipedia concept)
@@ -443,7 +438,7 @@ home_body = f"""
     <div>
       <span class="font-script font-bold text-gold text-2xl md:text-3xl">Craft cannabis, Iron Range grown</span>
       <h1 class="font-display font-extrabold text-4xl md:text-6xl leading-[1.06] mt-3 mb-6">Hibbing's Craft <em class="not-italic text-gold">Cannabis</em> Dispensary</h1>
-      <p class="text-white/85 text-lg md:text-xl max-w-2xl mb-9 leading-relaxed">Legal cannabis for sale to adults 21+ — order ahead online and pick up in store. A curated variety of flower, edibles, concentrates, tinctures, and topicals, with budtenders who take the time to help you dose with confidence. Proudly serving Hibbing and Iron Range neighbors within a five-mile radius.</p>
+      <p class="text-white/85 text-lg md:text-xl max-w-2xl mb-9 leading-relaxed">Legal cannabis for sale to adults 21+ — order ahead online and pick up in store. A curated variety of flower, edibles, concentrates, tinctures, and topicals, with budtenders who take the time to help you dose with confidence. Proudly serving Hibbing and Iron Range neighbors within 30 miles.</p>
       <div class="flex flex-wrap gap-4">
         <a href="shop.html" class="inline-flex items-center gap-2 bg-gold text-forest-deep font-label font-bold uppercase tracking-wider text-sm px-8 py-4 rounded-full hover:bg-gold-bright hover:shadow-pop transition-all">
           <span class="material-symbols-outlined" aria-hidden="true">storefront</span>Shop the Menu</a>
@@ -997,7 +992,7 @@ about_body = f"""
       <h2 class="font-display font-bold text-3xl md:text-4xl text-forest-deep mb-5">Why We Opened Our Doors</h2>
       <p class="text-ink-soft leading-relaxed mb-5">Hibbing built itself on hard work, community, and doing things right — and that's exactly how we built this dispensary. When Minnesota opened the door to legal adult-use cannabis, we saw a chance to bring the Range something it deserved: a local shop with lab-tested products, fair prices, and staff who actually take the time to help.</p>
       <p class="text-ink-soft leading-relaxed mb-5">We stock <a href='shop.html' class='text-forest font-semibold underline decoration-gold decoration-2 underline-offset-2 hover:text-forest-deep'>a curated variety</a>, not an overwhelming wall: craft flower from growers we trust, precisely dosed edibles and gummies, small-batch concentrates and oils, tinctures for the no-smoke crowd, and topicals and balms for targeted comfort. New to all of it? Our <a href='education.html' class='text-forest font-semibold underline decoration-gold decoration-2 underline-offset-2 hover:text-forest-deep'>education hub</a> was written for you.</p>
-      <p class="text-ink-soft leading-relaxed">Whether it's your first visit or your five-hundredth, you'll get the same welcome — no judgment, no rush, no pressure. We operate fully within <a href='cannabis-laws.html' class='text-forest font-semibold underline decoration-gold decoration-2 underline-offset-2 hover:text-forest-deep'>Minnesota's adult-use cannabis law</a>, serving Hibbing and Iron Range neighbors within a five-mile radius — from downtown Howard Street to Chisholm and Keewatin.</p>
+      <p class="text-ink-soft leading-relaxed">Whether it's your first visit or your five-hundredth, you'll get the same welcome — no judgment, no rush, no pressure. We operate fully within <a href='cannabis-laws.html' class='text-forest font-semibold underline decoration-gold decoration-2 underline-offset-2 hover:text-forest-deep'>Minnesota's adult-use cannabis law</a>, serving Hibbing and Iron Range neighbors within 30 miles of our downtown Howard Street shop.</p>
     </div>
     {img("THC-Cannabis-Store-02.jpg", "rounded-2xl shadow-pop object-cover w-full aspect-[4/3]")}
   </div>
@@ -1056,7 +1051,7 @@ contact_body = f"""
       <span class="material-symbols-outlined text-gold text-3xl mb-3" aria-hidden="true">location_on</span>
       <h2 class="font-display font-bold text-xl text-forest-deep mb-2">Visit the Shop</h2>
       <address class="not-italic text-sm text-ink-soft leading-relaxed">302 E Howard Street<br/>Hibbing, MN 55746</address>
-      <p class="text-xs text-ink-soft/80 mt-2">Downtown on Howard Street — a short walk from the Greyhound Bus Museum, serving Hibbing, Chisholm, Keewatin, and neighbors within 5 miles.</p>
+      <p class="text-xs text-ink-soft/80 mt-2">Downtown on Howard Street — a short walk from the Greyhound Bus Museum, serving Hibbing and Iron Range neighbors within 30 miles.</p>
       <p class="text-sm text-ink-soft mt-3">Mon–Sat 10am–9pm<br/>Sun 11am–6pm</p>
       <p class="text-xs text-ink-soft/70 mt-3">Valid 21+ ID required at the door.</p>
     </div>
@@ -1135,8 +1130,8 @@ FAQS = [
      "On private property with the owner's permission. Consumption is not allowed in public places, schools, or vehicles, and driving under the influence of cannabis is illegal."),
     ("Do you offer delivery?",
      "Not yet — we currently offer in-store shopping and order-ahead pickup. Join our newsletter or follow us for updates as our services grow."),
-    ("What cities do you serve?",
-     "We're located at 302 E Howard Street in downtown Hibbing and proudly serve Iron Range neighbors within about 10 miles, including Chisholm, Buhl, and Keewatin."),
+    ("What area do you serve?",
+     "We're located at 302 E Howard Street in downtown Hibbing, Minnesota, and proudly serve Iron Range neighbors within about 30 miles of the shop."),
 ]
 
 faq_items_html = "".join(f"""
