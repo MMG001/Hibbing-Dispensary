@@ -154,10 +154,10 @@ def node_business():
             "itemListElement": [{"@type": "Offer", "itemOffered": {"@id": SVC_ID(s[0])}} for s in SERVICES]},
         "potentialAction": [
             {"@type": "OrderAction", "name": "Order ahead for in-store pickup",
-             "target": {"@type": "EntryPoint", "urlTemplate": SITE_URL + "/shop", "inLanguage": "en-US",
+             "target": {"@type": "EntryPoint", "urlTemplate": SITE_URL + "/shop",
                 "actionPlatform": ["http://schema.org/DesktopWebPlatform", "http://schema.org/MobileWebPlatform"]}},
             {"@type": "AskAction", "name": "Send an inquiry",
-             "target": {"@type": "EntryPoint", "urlTemplate": SITE_URL + "/contact#contact-form", "inLanguage": "en-US",
+             "target": {"@type": "EntryPoint", "urlTemplate": SITE_URL + "/contact#contact-form",
                 "actionPlatform": ["http://schema.org/DesktopWebPlatform", "http://schema.org/MobileWebPlatform"]}},
             {"@type": "CommunicateAction", "name": "Call the dispensary",
              "target": {"@type": "EntryPoint", "urlTemplate": "tel:+12180000000",
