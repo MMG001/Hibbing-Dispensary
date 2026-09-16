@@ -192,7 +192,7 @@ def build_graph(filename, title, desc, og_image, page_type, crumbs, svc_level, e
 
 ICONS = "air,arrow_forward,call,close,cookie,diversity_3,expand_more,group,home_work,local_mall,location_on,mail,menu,schedule,school,science,shopping_bag,spa,storefront,verified,water_drop"
 ICONS_URL = "https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@24,400,0,0&icon_names=" + ICONS + "&display=block"
-TEXT_FONTS_URL = "https://fonts.googleapis.com/css2?family=DM+Sans:ital,opsz,wght@0,9..40,400..700;1,9..40,400..700&family=Space+Grotesk:wght@400..700&family=Syne:wght@600..800&display=swap"
+TEXT_FONTS_URL = "https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,500..800&family=Caveat:wght@600..700&family=Manrope:wght@400..800&display=swap"
 
 def head(title, desc, canonical, og_image="images/THC-Cannabis-Hero.jpg", graph=None, preload_hero=True):
     canon = url_of(canonical)
@@ -237,6 +237,7 @@ def head(title, desc, canonical, og_image="images/THC-Cannabis-Hero.jpg", graph=
   html {{ scroll-behavior: smooth; }}
   .sticker {{ transform: rotate(-2deg); }}
   .sticker-r {{ transform: rotate(2deg); }}
+  .blob {{ border-radius: 46% 54% 52% 48% / 44% 46% 54% 56%; }}
   .dropdown:hover .dropdown-menu, .dropdown:focus-within .dropdown-menu {{ opacity: 1; visibility: visible; transform: translateY(0); }}
   .dropdown-menu {{ opacity: 0; visibility: hidden; transform: translateY(8px); transition: all .18s ease; }}
   .hero-fade {{ background: linear-gradient(90deg, rgba(0,0,0,.82) 0%, rgba(0,0,0,.55) 45%, rgba(0,0,0,.15) 100%); }}
@@ -437,108 +438,189 @@ def hero_banner(image, eyebrow, title, sub=""):
 home_body = f"""
 <main id="main">
 <!-- HERO -->
-<section class="relative overflow-hidden bg-forest-deep">
-  {img("Hibbing-Hero.jpg", "absolute inset-0 h-full w-full object-cover", loading="eager")}
-  <div class="absolute inset-0 hero-fade" aria-hidden="true"></div>
-  <div class="relative mx-auto max-w-shell px-4 md:px-10 py-24 md:py-36">
-    <span class="sticker inline-block bg-gold text-forest-deep font-label font-bold text-xs uppercase tracking-widest px-4 py-1.5 rounded-full mb-6">Hibbing · Minnesota · 21+</span>
-    <h1 class="font-display font-extrabold text-white text-4xl md:text-6xl leading-tight mb-5 max-w-3xl">Hibbing's Craft Cannabis Dispensary</h1>
-    <p class="text-white/85 text-lg md:text-xl max-w-2xl mb-8 leading-relaxed">Legal cannabis for sale to adults 21+ — order ahead online and pick up in store. A curated variety of flower, edibles, concentrates, tinctures, and topicals, with budtenders who take the time to help you dose with confidence. Proudly serving Hibbing and Iron Range neighbors within a five-mile radius.</p>
-    <div class="flex flex-wrap gap-4">
-      <a href="shop.html" class="inline-flex items-center gap-2 bg-gold text-forest-deep font-label font-bold uppercase tracking-wider text-sm px-8 py-4 rounded-lg hover:bg-gold-bright hover:shadow-pop transition-all">
-        <span class="material-symbols-outlined" aria-hidden="true">storefront</span>Shop the Menu</a>
-      <a href="education.html" class="inline-flex items-center gap-2 border-2 border-white/60 text-white font-label font-bold uppercase tracking-wider text-sm px-8 py-4 rounded-lg hover:bg-white/10 transition-colors">
-        <span class="material-symbols-outlined" aria-hidden="true">school</span>New? Start Here</a>
+<section class="relative overflow-hidden bg-forest-deep text-white">
+  <div class="mx-auto max-w-shell px-4 md:px-10 py-20 md:py-28 grid gap-12 lg:grid-cols-2 items-center">
+    <div>
+      <span class="font-script font-bold text-gold text-2xl md:text-3xl">Craft cannabis, Iron Range grown</span>
+      <h1 class="font-display font-extrabold text-4xl md:text-6xl leading-[1.06] mt-3 mb-6">Hibbing's Craft <em class="not-italic text-gold">Cannabis</em> Dispensary</h1>
+      <p class="text-white/85 text-lg md:text-xl max-w-2xl mb-9 leading-relaxed">Legal cannabis for sale to adults 21+ — order ahead online and pick up in store. A curated variety of flower, edibles, concentrates, tinctures, and topicals, with budtenders who take the time to help you dose with confidence. Proudly serving Hibbing and Iron Range neighbors within a five-mile radius.</p>
+      <div class="flex flex-wrap gap-4">
+        <a href="shop.html" class="inline-flex items-center gap-2 bg-gold text-forest-deep font-label font-bold uppercase tracking-wider text-sm px-8 py-4 rounded-full hover:bg-gold-bright hover:shadow-pop transition-all">
+          <span class="material-symbols-outlined" aria-hidden="true">storefront</span>Shop the Menu</a>
+        <a href="education.html" class="inline-flex items-center gap-2 border-2 border-white/60 text-white font-label font-bold uppercase tracking-wider text-sm px-8 py-4 rounded-full hover:bg-white/10 transition-colors">
+          <span class="material-symbols-outlined" aria-hidden="true">school</span>New? Start Here</a>
+      </div>
+    </div>
+    <div class="relative w-full max-w-xl mx-auto lg:mx-0 lg:justify-self-end">
+      {img("Hibbing-Hero.jpg", "blob w-full aspect-square object-cover border-8 border-gold/25", loading="eager")}
+      <span class="absolute -top-3 -left-2 text-5xl -rotate-12" aria-hidden="true">🍃</span>
+      <span class="absolute bottom-4 -right-2 text-4xl rotate-12" aria-hidden="true">🍃</span>
     </div>
   </div>
 </section>
 
-<!-- TRUST BAR -->
-<section aria-label="Store highlights" class="bg-surface">
-  <svg viewBox="0 0 1440 48" class="block w-full text-forest-night" preserveAspectRatio="none" aria-hidden="true" style="margin-bottom:-1px">
-    <path fill="currentColor" d="M0,32 C180,8 340,4 520,18 C700,32 860,44 1040,34 C1220,24 1330,10 1440,22 L1440,48 L0,48 Z"/>
-  </svg>
-  <div class="bg-forest-night text-white">
-    <div class="mx-auto max-w-shell px-4 md:px-10 py-8 flex flex-wrap items-center justify-center lg:justify-between gap-x-10 gap-y-6">
-      <div class="flex items-baseline gap-3">
-        <span class="font-display font-extrabold text-2xl md:text-3xl">21+</span>
-        <span class="leading-tight"><span class="block font-body font-semibold text-sm">Valid ID required</span>
-        <span class="block font-label text-[11px] font-bold uppercase tracking-widest text-white/60">Adult Use</span></span>
+<!-- FEATURE STRIP -->
+<section aria-label="Store highlights" class="bg-forest text-white border-t border-white/10">
+  <div class="mx-auto max-w-shell px-4 md:px-10 py-5 flex flex-wrap items-center justify-center lg:justify-between gap-x-10 gap-y-4">
+    <span class="inline-flex items-center gap-2 font-body font-bold text-sm"><span class="text-gold" aria-hidden="true">✦</span>21+ with valid ID, every visit</span>
+    <span class="inline-flex items-center gap-2 font-body font-bold text-sm"><span class="text-gold" aria-hidden="true">✦</span>OCM licensed · Minnesota</span>
+    <span class="inline-flex items-center gap-2 font-body font-bold text-sm"><span class="text-gold" aria-hidden="true">✦</span>Cash &amp; debit · ATM on-site</span>
+    <span class="inline-flex items-center gap-2 font-body font-bold text-sm"><span class="text-gold" aria-hidden="true">✦</span>Open 7 days a week</span>
+    <a href="shop.html" class="inline-flex items-center gap-2 bg-[#43a819] text-forest-deep border-2 border-white rounded-full px-5 py-2.5 shadow-modal hover:bg-[#4dbb1f] transition-colors">
+      <span class="font-label text-[11px] font-bold uppercase tracking-widest">Pickup</span>
+      <span class="font-body font-bold text-sm">Ready in ~15 min</span>
+    </a>
+  </div>
+</section>
+
+<!-- CATEGORIES -->
+<section class="py-20 bg-white">
+  <div class="mx-auto max-w-shell px-4 md:px-10">
+    <div class="flex items-end justify-between mb-10 flex-wrap gap-4">
+      <div>
+        <span class="font-script font-bold text-forest text-2xl">The lineup</span>
+        <h2 class="font-display font-extrabold text-3xl md:text-4xl text-forest-deep mt-1">Carefully Curated Cannabis, Crafted With Care</h2>
+        <p class="text-ink-soft mt-3 max-w-xl">Every category, every consumption style — from fast-onset inhalation to slow-burn edibles that last several hours.</p>
       </div>
-      <div class="flex items-baseline gap-3">
-        <span class="font-display font-extrabold text-2xl md:text-3xl">Cash</span>
-        <span class="leading-tight"><span class="block font-body font-semibold text-sm">&amp; Debit</span>
-        <span class="block font-label text-[11px] font-bold uppercase tracking-widest text-white/60">ATM On-Site</span></span>
-      </div>
-      <div class="flex items-baseline gap-3">
-        <span class="font-display font-extrabold text-2xl md:text-3xl">OCM</span>
-        <span class="leading-tight"><span class="block font-body font-semibold text-sm">Licensed</span>
-        <span class="block font-label text-[11px] font-bold uppercase tracking-widest text-white/60">Minnesota</span></span>
-      </div>
-      <div class="flex items-baseline gap-3">
-        <span class="font-display font-extrabold text-2xl md:text-3xl">7 days</span>
-        <span class="leading-tight"><span class="block font-body font-semibold text-sm">Open every day</span>
-        <span class="block font-label text-[11px] font-bold uppercase tracking-widest text-white/60">Hours</span></span>
-      </div>
-      <a href="shop.html" class="inline-flex items-center gap-2 bg-[#43a819] text-forest-deep border-2 border-white rounded-full px-5 py-2.5 shadow-modal hover:bg-[#4dbb1f] transition-colors">
-        <span class="font-label text-[11px] font-bold uppercase tracking-widest">Pickup</span>
-        <span class="font-body font-bold text-sm">Ready in ~15 min</span>
+      <a href="shop.html" class="inline-flex items-center gap-2 bg-gold text-forest-deep font-label font-bold uppercase tracking-wider text-sm px-7 py-3.5 rounded-full hover:bg-gold-bright hover:shadow-pop transition-all">View Full Menu</a>
+    </div>
+    <div class="grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
+
+      <a href="shop.html" class="group relative bg-surface rounded-3xl overflow-hidden shadow-card hover:shadow-pop hover:-translate-y-1.5 transition-all">
+        <div class="aspect-[16/10] overflow-hidden">{img("THC-Cannabis-01.jpg", "h-full w-full object-cover group-hover:scale-105 transition-transform duration-300")}</div>
+        <span class="absolute top-4 right-5 font-display font-extrabold text-4xl text-white/90 drop-shadow-lg" aria-hidden="true">01</span>
+        <div class="p-6">
+          <h3 class="font-display font-bold text-xl text-forest-deep">Flower</h3>
+          <p class="text-sm text-ink-soft mt-1 mb-3">Hand-trimmed strains, jarred fresh</p>
+          <span class="font-label font-bold text-sm text-forest inline-flex items-center gap-1.5">View More<span class="material-symbols-outlined text-lg group-hover:translate-x-1 transition-transform" aria-hidden="true">arrow_forward</span></span>
+        </div>
+      </a>
+      <a href="shop.html" class="group relative bg-surface rounded-3xl overflow-hidden shadow-card hover:shadow-pop hover:-translate-y-1.5 transition-all">
+        <div class="aspect-[16/10] overflow-hidden">{img("THC-Edible-Gummies-01.jpg", "h-full w-full object-cover group-hover:scale-105 transition-transform duration-300")}</div>
+        <span class="absolute top-4 right-5 font-display font-extrabold text-4xl text-white/90 drop-shadow-lg" aria-hidden="true">02</span>
+        <div class="p-6">
+          <h3 class="font-display font-bold text-xl text-forest-deep">Edibles</h3>
+          <p class="text-sm text-ink-soft mt-1 mb-3">Gummies dosed for a slow, lasting ride</p>
+          <span class="font-label font-bold text-sm text-forest inline-flex items-center gap-1.5">View More<span class="material-symbols-outlined text-lg group-hover:translate-x-1 transition-transform" aria-hidden="true">arrow_forward</span></span>
+        </div>
+      </a>
+      <a href="shop.html" class="group relative bg-surface rounded-3xl overflow-hidden shadow-card hover:shadow-pop hover:-translate-y-1.5 transition-all">
+        <div class="aspect-[16/10] overflow-hidden">{img("THC-Concentrates-02.jpg", "h-full w-full object-cover group-hover:scale-105 transition-transform duration-300")}</div>
+        <span class="absolute top-4 right-5 font-display font-extrabold text-4xl text-white/90 drop-shadow-lg" aria-hidden="true">03</span>
+        <div class="p-6">
+          <h3 class="font-display font-bold text-xl text-forest-deep">Concentrates</h3>
+          <p class="text-sm text-ink-soft mt-1 mb-3">Live rosin, extracts &amp; golden oils</p>
+          <span class="font-label font-bold text-sm text-forest inline-flex items-center gap-1.5">View More<span class="material-symbols-outlined text-lg group-hover:translate-x-1 transition-transform" aria-hidden="true">arrow_forward</span></span>
+        </div>
+      </a>
+      <a href="shop.html" class="group relative bg-surface rounded-3xl overflow-hidden shadow-card hover:shadow-pop hover:-translate-y-1.5 transition-all">
+        <div class="aspect-[16/10] overflow-hidden">{img("THC-Vaporizer-01.jpg", "h-full w-full object-cover group-hover:scale-105 transition-transform duration-300")}</div>
+        <span class="absolute top-4 right-5 font-display font-extrabold text-4xl text-white/90 drop-shadow-lg" aria-hidden="true">04</span>
+        <div class="p-6">
+          <h3 class="font-display font-bold text-xl text-forest-deep">Vaporizers</h3>
+          <p class="text-sm text-ink-soft mt-1 mb-3">Cartridges &amp; hardware for clean inhalation</p>
+          <span class="font-label font-bold text-sm text-forest inline-flex items-center gap-1.5">View More<span class="material-symbols-outlined text-lg group-hover:translate-x-1 transition-transform" aria-hidden="true">arrow_forward</span></span>
+        </div>
+      </a>
+      <a href="shop.html" class="group relative bg-surface rounded-3xl overflow-hidden shadow-card hover:shadow-pop hover:-translate-y-1.5 transition-all">
+        <div class="aspect-[16/10] overflow-hidden">{img("THC-Prerolls-01.jpg", "h-full w-full object-cover group-hover:scale-105 transition-transform duration-300")}</div>
+        <span class="absolute top-4 right-5 font-display font-extrabold text-4xl text-white/90 drop-shadow-lg" aria-hidden="true">05</span>
+        <div class="p-6">
+          <h3 class="font-display font-bold text-xl text-forest-deep">Pre-Rolls</h3>
+          <p class="text-sm text-ink-soft mt-1 mb-3">Rolled tight, ready when you are</p>
+          <span class="font-label font-bold text-sm text-forest inline-flex items-center gap-1.5">View More<span class="material-symbols-outlined text-lg group-hover:translate-x-1 transition-transform" aria-hidden="true">arrow_forward</span></span>
+        </div>
+      </a>
+      <a href="shop.html" class="group relative bg-surface rounded-3xl overflow-hidden shadow-card hover:shadow-pop hover:-translate-y-1.5 transition-all">
+        <div class="aspect-[16/10] overflow-hidden">{img("About-Us-page.jpg", "h-full w-full object-cover group-hover:scale-105 transition-transform duration-300")}</div>
+        <span class="absolute top-4 right-5 font-display font-extrabold text-4xl text-white/90 drop-shadow-lg" aria-hidden="true">06</span>
+        <div class="p-6">
+          <h3 class="font-display font-bold text-xl text-forest-deep">Tinctures &amp; Topicals</h3>
+          <p class="text-sm text-ink-soft mt-1 mb-3">Drops under the tongue, balms for the skin</p>
+          <span class="font-label font-bold text-sm text-forest inline-flex items-center gap-1.5">View More<span class="material-symbols-outlined text-lg group-hover:translate-x-1 transition-transform" aria-hidden="true">arrow_forward</span></span>
+        </div>
       </a>
     </div>
   </div>
 </section>
 
-<!-- CATEGORIES -->
+<!-- ONSET GUIDE STRIP -->
 <section class="py-20 bg-surface">
   <div class="mx-auto max-w-shell px-4 md:px-10">
-    <div class="flex items-end justify-between mb-10 flex-wrap gap-4">
-      <div>
-        <h2 class="font-display font-bold text-3xl md:text-4xl text-forest-deep">Browse the Collection</h2>
-        <p class="text-ink-soft mt-2 max-w-xl">Every category, every consumption style — from fast-onset inhalation to slow-burn edibles that last several hours.</p>
+    <span class="font-script font-bold text-forest text-2xl">Know before you glow</span>
+    <h2 class="font-display font-extrabold text-3xl md:text-4xl text-forest-deep mt-1 mb-3">Know Your Onset</h2>
+    <p class="text-ink-soft mb-10 max-w-2xl">How you consume changes when the effects arrive — and how long they last. Read the full breakdown in <a href="cannabis-101.html" class="text-forest font-bold underline decoration-gold decoration-2 underline-offset-2 hover:text-forest-deep">Cannabis 101</a>, or <a href="contact.html" class="text-forest font-bold underline decoration-gold decoration-2 underline-offset-2 hover:text-forest-deep">ask a budtender</a> to help you find your dose.</p>
+    <div class="grid gap-6 sm:grid-cols-2 lg:grid-cols-4">
+      <div class="bg-white rounded-3xl p-7 shadow-card hover:-translate-y-1 transition-transform">
+        <span class="inline-grid place-items-center w-14 h-14 rounded-full bg-gold-soft text-2xl mb-4" aria-hidden="true">💨</span>
+        <h3 class="font-display font-bold text-xl text-forest-deep mb-2">Inhalation</h3>
+        <p class="text-sm text-ink-soft leading-relaxed">Flower, pre-rolls &amp; vapes. Onset in minutes; effects typically fade within one to three hours. Easiest to fine-tune.</p>
       </div>
-      <a href="shop.html" class="font-label font-semibold uppercase tracking-wider text-sm text-forest border-b-2 border-gold pb-1 hover:text-forest-deep">View Full Menu</a>
-    </div>
-    <div class="grid gap-5 sm:grid-cols-2 lg:grid-cols-3">
-""" + "".join(f"""
-      <a href="shop.html" class="group relative bg-white rounded-xl overflow-hidden shadow-card hover:shadow-pop hover:-translate-y-1 transition-all border border-outline-soft/30">
-        <div class="aspect-[4/3] overflow-hidden">{img(im, "h-full w-full object-cover group-hover:scale-105 transition-transform duration-300")}</div>
-        <span class="sticker absolute top-4 left-4 bg-gold text-forest-deep font-label font-bold text-[11px] uppercase tracking-widest px-3 py-1 rounded-full">{badge}</span>
-        <div class="p-5 flex items-center justify-between">
-          <div><h3 class="font-display font-bold text-xl text-forest-deep">{name}</h3><p class="text-sm text-ink-soft mt-1">{blurb}</p></div>
-          <span class="material-symbols-outlined text-gold group-hover:translate-x-1 transition-transform" aria-hidden="true">arrow_forward</span>
-        </div>
-      </a>""" for im, name, blurb, badge in [
-        ("THC-Cannabis-01.jpg", "Flower", "Hand-trimmed strains, jarred fresh", "Craft Grown"),
-        ("THC-Edible-Gummies-01.jpg", "Edibles", "Gummies dosed for a slow, lasting ride", "Precise Dose"),
-        ("THC-Concentrates-02.jpg", "Concentrates", "Live rosin, extracts &amp; golden oils", "Full Spectrum"),
-        ("THC-Vaporizer-01.jpg", "Vaporizers", "Cartridges &amp; hardware for clean inhalation", "Fast Onset"),
-        ("THC-Prerolls-01.jpg", "Pre-Rolls", "Rolled tight, ready when you are", "Ready to Go"),
-        ("About-Us-page.jpg", "Tinctures &amp; Topicals", "Drops under the tongue, balms for the skin", "No-Smoke"),
-      ]) + f"""
+      <div class="bg-white rounded-3xl p-7 shadow-card hover:-translate-y-1 transition-transform">
+        <span class="inline-grid place-items-center w-14 h-14 rounded-full bg-gold-soft text-2xl mb-4" aria-hidden="true">🍬</span>
+        <h3 class="font-display font-bold text-xl text-forest-deep mb-2">Edibles</h3>
+        <p class="text-sm text-ink-soft leading-relaxed">Gummies &amp; infused treats. Onset can take 30 minutes to two hours — and effects can last several hours. Start low, go slow.</p>
+      </div>
+      <div class="bg-white rounded-3xl p-7 shadow-card hover:-translate-y-1 transition-transform">
+        <span class="inline-grid place-items-center w-14 h-14 rounded-full bg-gold-soft text-2xl mb-4" aria-hidden="true">💧</span>
+        <h3 class="font-display font-bold text-xl text-forest-deep mb-2">Tinctures</h3>
+        <p class="text-sm text-ink-soft leading-relaxed">Drops under the tongue for a middle-ground onset between inhalation and edibles.</p>
+      </div>
+      <div class="bg-white rounded-3xl p-7 shadow-card hover:-translate-y-1 transition-transform">
+        <span class="inline-grid place-items-center w-14 h-14 rounded-full bg-gold-soft text-2xl mb-4" aria-hidden="true">🧴</span>
+        <h3 class="font-display font-bold text-xl text-forest-deep mb-2">Topicals</h3>
+        <p class="text-sm text-ink-soft leading-relaxed">Balms and creams applied to the skin for targeted relief without psychoactive effects.</p>
+      </div>
     </div>
   </div>
 </section>
 
-<!-- ONSET GUIDE STRIP -->
-<section class="py-16 bg-forest text-white">
+<!-- PROMO TRIO -->
+<section class="py-20 bg-surface">
+  <div class="mx-auto max-w-shell px-4 md:px-10 grid gap-6 md:grid-cols-3">
+    <div class="rounded-3xl p-9 bg-gradient-to-br from-forest to-forest-deep text-white flex flex-col justify-between items-start gap-6 min-h-[220px]">
+      <div><span class="font-script font-bold text-gold text-2xl">100% legal</span>
+      <h3 class="font-display font-extrabold text-2xl leading-tight mt-1">Licensed Minnesota Cannabis Store</h3></div>
+      <a href="shop.html" class="bg-gold text-forest-deep font-label font-bold uppercase tracking-wider text-sm px-7 py-3 rounded-full hover:bg-gold-bright transition-colors">Shop Now</a>
+    </div>
+    <div class="rounded-3xl p-9 bg-gold text-forest-deep flex flex-col justify-between items-start gap-6 min-h-[220px]">
+      <div><span class="font-script font-bold text-forest text-2xl">Skip the wait</span>
+      <h3 class="font-display font-extrabold text-2xl leading-tight mt-1">Order Ahead — Pickup in ~15 Minutes</h3></div>
+      <a href="shop.html" class="bg-forest text-white font-label font-bold uppercase tracking-wider text-sm px-7 py-3 rounded-full hover:bg-forest-deep transition-colors">Order Now</a>
+    </div>
+    <div class="rounded-3xl p-9 bg-gradient-to-br from-forest-deep to-forest-night text-white flex flex-col justify-between items-start gap-6 min-h-[220px]">
+      <div><span class="font-script font-bold text-gold text-2xl">Every day</span>
+      <h3 class="font-display font-extrabold text-2xl leading-tight mt-1">Open 7 Days a Week on Howard Street</h3></div>
+      <a href="contact.html" class="bg-gold text-forest-deep font-label font-bold uppercase tracking-wider text-sm px-7 py-3 rounded-full hover:bg-gold-bright transition-colors">Visit Us</a>
+    </div>
+  </div>
+</section>
+
+<!-- HOW IT WORKS -->
+<section class="py-20 bg-forest-deep text-white">
   <div class="mx-auto max-w-shell px-4 md:px-10">
-    <h2 class="font-display font-bold text-3xl mb-2">Know Your Onset</h2>
-    <p class="text-white/75 mb-10 max-w-2xl">How you consume changes when the effects arrive — and how long they last. Read the full breakdown in <a href="cannabis-101.html" class="text-gold-bright font-semibold underline decoration-gold decoration-2 underline-offset-2 hover:text-white">Cannabis 101</a>, or <a href="contact.html" class="text-gold-bright font-semibold underline decoration-gold decoration-2 underline-offset-2 hover:text-white">ask a budtender</a> to help you find your dose.</p>
-    <div class="grid gap-6 md:grid-cols-3">
-      <div class="bg-forest-deep/60 rounded-xl p-6 border border-gold/20">
-        <span class="material-symbols-outlined text-gold text-3xl mb-3" aria-hidden="true">air</span>
-        <h3 class="font-display font-bold text-xl mb-2">Inhalation</h3>
-        <p class="text-sm text-white/80 leading-relaxed">Flower, pre-rolls &amp; vapes. Onset in minutes; effects typically fade within one to three hours. Easiest to fine-tune.</p>
+    <span class="font-script font-bold text-gold text-2xl">How it works</span>
+    <h2 class="font-display font-extrabold text-3xl md:text-4xl mt-1 mb-10">From Our Menu to Your Hands</h2>
+    <div class="grid gap-6 sm:grid-cols-2 lg:grid-cols-4">
+      <div class="rounded-3xl border border-white/15 p-7">
+        <span class="font-script font-bold text-gold text-xl">step 01</span>
+        <h3 class="font-display font-bold text-lg mt-2 mb-2">Browse the menu</h3>
+        <p class="text-sm text-white/75">Explore flower, edibles, concentrates and more on the <a href="shop.html" class="text-gold underline underline-offset-2 hover:text-gold-bright">online menu</a>.</p>
       </div>
-      <div class="bg-forest-deep/60 rounded-xl p-6 border border-gold/20">
-        <span class="material-symbols-outlined text-gold text-3xl mb-3" aria-hidden="true">cookie</span>
-        <h3 class="font-display font-bold text-xl mb-2">Edibles</h3>
-        <p class="text-sm text-white/80 leading-relaxed">Gummies &amp; infused treats. Onset can take 30 minutes to two hours — and effects can last several hours. Start low, go slow.</p>
+      <div class="rounded-3xl border border-white/15 p-7">
+        <span class="font-script font-bold text-gold text-xl">step 02</span>
+        <h3 class="font-display font-bold text-lg mt-2 mb-2">Place your order</h3>
+        <p class="text-sm text-white/75">Order ahead online — we start prepping right away.</p>
       </div>
-      <div class="bg-forest-deep/60 rounded-xl p-6 border border-gold/20">
-        <span class="material-symbols-outlined text-gold text-3xl mb-3" aria-hidden="true">water_drop</span>
-        <h3 class="font-display font-bold text-xl mb-2">Tinctures &amp; Topicals</h3>
-        <p class="text-sm text-white/80 leading-relaxed">Drop a tincture under the tongue for a middle-ground onset, or apply a balm to the skin for targeted relief without psychoactive effects.</p>
+      <div class="rounded-3xl border border-white/15 p-7">
+        <span class="font-script font-bold text-gold text-xl">step 03</span>
+        <h3 class="font-display font-bold text-lg mt-2 mb-2">Bring a valid ID</h3>
+        <p class="text-sm text-white/75">21+ every visit. Everyone gets carded, even you.</p>
+      </div>
+      <div class="rounded-3xl border border-white/15 p-7">
+        <span class="font-script font-bold text-gold text-xl">step 04</span>
+        <h3 class="font-display font-bold text-lg mt-2 mb-2">Pick up in store</h3>
+        <p class="text-sm text-white/75">Ready in about 15 minutes. Cash &amp; debit, ATM on-site.</p>
       </div>
     </div>
   </div>
@@ -557,9 +639,9 @@ home_body = f"""
       <h2 class="font-display font-bold text-3xl md:text-4xl text-forest-deep mb-4">A Dispensary Built for the Range</h2>
       <p class="text-ink-soft leading-relaxed mb-6">Walk in and feel the difference: labeled jars you can look at up close, lab-tested products, and budtenders who ask the right questions before recommending anything. Whether you're here for high-THC flower or a gentle CBD tincture, we'll help you find it.</p>
       <ul class="space-y-3 text-sm text-ink mb-8">
-        <li class="flex gap-3"><span class="material-symbols-outlined text-gold" aria-hidden="true">verified</span>Every batch lab-tested with certificates of analysis available</li>
-        <li class="flex gap-3"><span class="material-symbols-outlined text-gold" aria-hidden="true">group</span>Friendly, judgment-free guidance for first-timers and connoisseurs</li>
-        <li class="flex gap-3"><span class="material-symbols-outlined text-gold" aria-hidden="true">local_mall</span>Order ahead online, pick up in store</li>
+        <li class="flex gap-3"><span class="material-symbols-outlined text-forest" aria-hidden="true">verified</span>Every batch lab-tested with certificates of analysis available</li>
+        <li class="flex gap-3"><span class="material-symbols-outlined text-forest" aria-hidden="true">group</span>Friendly, judgment-free guidance for first-timers and connoisseurs</li>
+        <li class="flex gap-3"><span class="material-symbols-outlined text-forest" aria-hidden="true">local_mall</span>Order ahead online, pick up in store</li>
       </ul>
       <a href="contact.html" class="inline-flex items-center gap-2 bg-forest text-white font-label font-bold uppercase tracking-wider text-sm px-8 py-4 rounded-lg hover:bg-forest-deep hover:shadow-pop transition-all">
         <span class="material-symbols-outlined" aria-hidden="true">location_on</span>Get Directions</a>
@@ -638,7 +720,7 @@ shop_body = f"""
     -->
     <!-- DUTCHIE-START -->
     <div id="dutchie-menu-placeholder" class="bg-white rounded-2xl border-2 border-dashed border-forest/30 shadow-card p-10 md:p-16 text-center">
-      <span class="material-symbols-outlined text-gold text-6xl mb-4" aria-hidden="true">storefront</span>
+      <span class="material-symbols-outlined text-forest text-6xl mb-4" aria-hidden="true">storefront</span>
       <h2 class="font-display font-bold text-2xl md:text-3xl text-forest-deep mb-3">Online Menu Coming Soon</h2>
       <p class="text-ink-soft max-w-xl mx-auto mb-8">Our live Dutchie ordering menu will appear right here, so you can order ahead and pick up in about 15 minutes. In the meantime, visit us in store or <a href='contact.html' class='text-forest font-semibold underline decoration-gold decoration-2 underline-offset-2 hover:text-forest-deep'>contact us</a> to ask about today's selection of <a href='cannabis-strains.html' class='text-forest font-semibold underline decoration-gold decoration-2 underline-offset-2 hover:text-forest-deep'>strains</a>, edibles, and concentrates.</p>
       <div class="flex flex-wrap justify-center gap-4">
@@ -738,9 +820,9 @@ def article(filename, hero_im, eyebrow, title, sub, sections, next_href, next_la
     <nav aria-label="Breadcrumb" class="mb-8">
       <ol class="flex flex-wrap items-center gap-2 font-label text-xs font-semibold uppercase tracking-wider text-ink-soft">
         <li><a href="index.html" class="hover:text-forest">Home</a></li>
-        <li aria-hidden="true" class="text-gold">/</li>
+        <li aria-hidden="true" class="text-forest">/</li>
         <li><a href="education.html" class="hover:text-forest">Education</a></li>
-        <li aria-hidden="true" class="text-gold">/</li>
+        <li aria-hidden="true" class="text-forest">/</li>
         <li aria-current="page" class="text-forest">{title.split(":")[0]}</li>
       </ol>
     </nav>
