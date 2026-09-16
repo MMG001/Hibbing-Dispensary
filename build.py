@@ -438,7 +438,7 @@ home_body = f"""
 <main id="main">
 <!-- HERO -->
 <section class="relative overflow-hidden bg-forest-deep">
-  {img("THC-Cannabis-Hero.jpg", "absolute inset-0 h-full w-full object-cover", loading="eager")}
+  {img("Hibbing-Hero.jpg", "absolute inset-0 h-full w-full object-cover", loading="eager")}
   <div class="absolute inset-0 hero-fade" aria-hidden="true"></div>
   <div class="relative mx-auto max-w-shell px-4 md:px-10 py-24 md:py-36">
     <span class="sticker inline-block bg-gold text-forest-deep font-label font-bold text-xs uppercase tracking-widest px-4 py-1.5 rounded-full mb-6">Hibbing · Minnesota · 21+</span>
@@ -610,7 +610,7 @@ home_body = f"""
 """
 page("index.html", "Cannabis Dispensary in Hibbing, MN | Hibbing Dispensary",
      "Licensed cannabis dispensary in Hibbing, MN. Legal cannabis for sale — order ahead online for 15-minute pickup. Flower, edibles, concentrates & more. 21+.",
-     "home", home_body, svc_level="card")
+     "home", home_body, "images/Hibbing-Hero.jpg", svc_level="card")
 
 # ============================================================ SHOP
 shop_body = f"""
