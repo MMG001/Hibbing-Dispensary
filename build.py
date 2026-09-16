@@ -99,8 +99,8 @@ def service_nodes(level):
              "url": SITE_URL + "/shop", "provider": {"@id": SITE_URL + "/#business"}}
         if level == "card":
             n.update({"serviceType": stype, "description": blurb,
-                      "areaServed": {"@id": SITE_URL + "/#service-area"}, "inLanguage": "en-US",
-                      "about": {"@type": "Thing", "name": name, "sameAs": concept}})
+                      "areaServed": {"@id": SITE_URL + "/#service-area"},
+                      "category": {"@type": "Thing", "name": name, "sameAs": concept}})
         nodes.append(n)
     return nodes
 
