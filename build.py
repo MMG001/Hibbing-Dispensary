@@ -59,9 +59,9 @@ WIKI = {
     "Minnesota": "https://en.wikipedia.org/wiki/Minnesota",
 }
 GEO = {"@type": "GeoCoordinates", "latitude": 47.4272, "longitude": -92.9377}
-GEO_CIRCLE = {"@type": "GeoCircle",
+GEO_CIRCLE = {"@type": "GeoCircle", "@id": SITE_URL + "/#service-area",
     "description": "30-mile service radius anchored on Hibbing, Minnesota",
-    "geoMidpoint": GEO, "geoRadius": "48280"}
+    "geoMidpoint": GEO, "geoRadius": 48280}
 AREA_SERVED = [
     GEO_CIRCLE,
     {"@type": "State", "name": "Minnesota", "sameAs": WIKI["Minnesota"]},
@@ -99,7 +99,7 @@ def service_nodes(level):
              "url": SITE_URL + "/shop", "provider": {"@id": SITE_URL + "/#business"}}
         if level == "card":
             n.update({"serviceType": stype, "description": blurb,
-                      "areaServed": GEO_CIRCLE, "inLanguage": "en-US",
+                      "areaServed": {"@id": SITE_URL + "/#service-area"}, "inLanguage": "en-US",
                       "about": {"@type": "Thing", "name": name, "sameAs": concept}})
         nodes.append(n)
     return nodes
@@ -130,15 +130,30 @@ def node_business():
             {"@type": "OpeningHoursSpecification", "dayOfWeek": "Sunday", "opens": "11:00", "closes": "18:00"}],
         "audience": {"@type": "PeopleAudience", "audienceType": "Adult cannabis consumers", "suggestedMinAge": 21,
             "geographicArea": {"@type": "AdministrativeArea", "name": "Hibbing, Minnesota", "sameAs": WIKI["Hibbing"]}},
+        "brand": {"@type": "Brand", "name": "Hibbing Dispensary"},
+        "amenityFeature": [
+            {"@type": "LocationFeatureSpecification", "name": "ATM On-Site", "value": True},
+            {"@type": "LocationFeatureSpecification", "name": "Cash & Debit Accepted", "value": True},
+            {"@type": "LocationFeatureSpecification", "name": "Order-Ahead Pickup (~15 min)", "value": True},
+            {"@type": "LocationFeatureSpecification", "name": "Lab-Tested Products, COAs Available", "value": True},
+            {"@type": "LocationFeatureSpecification", "name": "21+ ID Check", "value": True},
+            {"@type": "LocationFeatureSpecification", "name": "Open 7 Days a Week", "value": True}],
         "keywords": "cannabis dispensary, Hibbing MN, legal cannabis for sale, order ahead cannabis, THC, CBD, edibles, flower, concentrates",
         "knowsAbout": [
             {"@type": "Thing", "name": "Cannabis", "sameAs": "https://en.wikipedia.org/wiki/Cannabis_(drug)"},
             {"@type": "Thing", "name": "THC", "sameAs": "https://en.wikipedia.org/wiki/Tetrahydrocannabinol"},
             {"@type": "Thing", "name": "CBD", "sameAs": "https://en.wikipedia.org/wiki/Cannabidiol"},
+            {"@type": "Thing", "name": "Cannabis edibles", "sameAs": "https://en.wikipedia.org/wiki/Cannabis_edible"},
+            {"@type": "Thing", "name": "Cannabis concentrates", "sameAs": "https://en.wikipedia.org/wiki/Cannabis_concentrate"},
+            {"@type": "Thing", "name": "Cannabis strains", "sameAs": "https://en.wikipedia.org/wiki/Cannabis_strain"},
+            {"@type": "Thing", "name": "Pre-rolls", "sameAs": "https://en.wikipedia.org/wiki/Joint_(cannabis)"},
+            {"@type": "Thing", "name": "Cannabis tinctures", "sameAs": "https://en.wikipedia.org/wiki/Tincture_of_cannabis"},
+            {"@type": "Thing", "name": "Vaporizers", "sameAs": "https://en.wikipedia.org/wiki/Vaporizer_(inhalation_device)"},
+            {"@type": "Thing", "name": "Hibbing, Minnesota", "sameAs": WIKI["Hibbing"]},
+            {"@type": "Thing", "name": "Iron Range", "sameAs": "https://en.wikipedia.org/wiki/Iron_Range"},
             {"@type": "Thing", "name": "Minnesota cannabis law", "sameAs": "https://www.revisor.mn.gov/statutes/cite/342.09"}],
         "hasOfferCatalog": {"@type": "OfferCatalog", "name": "Cannabis Menu",
-            "itemListElement": [{"@id": SVC_ID(s[0])} for s in SERVICES]},
-        "sameAs": ["https://github.com/MMG001/Hibbing-Dispensary"],
+            "itemListElement": [{"@type": "Offer", "itemOffered": {"@id": SVC_ID(s[0])}} for s in SERVICES]},
         "potentialAction": [
             {"@type": "OrderAction", "name": "Order ahead for in-store pickup",
              "target": {"@type": "EntryPoint", "urlTemplate": SITE_URL + "/shop", "inLanguage": "en-US",
@@ -171,7 +186,7 @@ def node_webpage(filename, title, desc, og_image, page_type="WebPage", main_enti
          "name": title, "description": desc,
          "isPartOf": {"@id": SITE_URL + "/#website"}, "about": {"@id": SITE_URL + "/#business"},
          "breadcrumb": {"@id": url_of(filename) + "#breadcrumb"},
-         "primaryImageOfPage": SITE_URL + "/" + og_image, "inLanguage": "en-US"}
+         "primaryImageOfPage": {"@type": "ImageObject", "url": SITE_URL + "/" + og_image}, "inLanguage": "en-US"}
     if main_entity:
         n["mainEntity"] = {"@id": main_entity}
     return n
